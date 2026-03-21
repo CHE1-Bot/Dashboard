@@ -103,6 +103,14 @@ display:flex;
 flex-direction:column; /* TÄRKEIN */
 }
 
+.content{
+    display: flex;
+    flex-direction: column; /* TÄRKEIN */
+    gap: 10px; /* väli accordionien väliin */
+}
+
+/* ACCORDION */
+
 .accordion1{
 width:100%;
 color:rgb(0, 0, 0);
@@ -161,15 +169,50 @@ transition:all 0.3s ease;
 padding:0 15px;
 }
 
+.accordion3{
+width:100%;
+color:rgb(0, 0, 0);
+}
+
+.accordion-item3{
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.accordion-header3{
+cursor:pointer;
+padding:15px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.accordion-header3:hover{
+background:rgba(255,255,255,0.05);
+}
+
+.accordion-content3{
+max-height:0;
+overflow:hidden;
+transition:all 0.3s ease;
+padding:0 15px;
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 500px;
+}
+
 /* open state */
+
 .accordion-item1.active .accordion-content1{
 max-height:500px; /* riittää */
 padding:15px;
 }
 
 .content1{
-flex:1;
 display:flex;
+flex-direction: column;
+gap: 10px;
 }
 
 .accordion-item2.active .accordion-content2{
@@ -178,9 +221,23 @@ padding:15px;
 }
 
 .content2{
-flex:1;
 display:flex;
+flex-direction: column;
+gap: 10px;
 }
+
+.accordion-item3.active .accordion-content3{
+max-height:500px; /* riittää */
+padding:15px;
+}
+
+.content3{
+display:flex;
+flex-direction: column;
+gap: 10px;
+}
+
+/* CHECK BUTTONS */
 
 #check-button1{
     width: 100px;
@@ -263,6 +320,44 @@ display:flex;
     background-color: #f4f6fb;
 }
 
+#check-button9{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button10{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button11{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button12{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+/* Toggle buttons */
+
 .button1{
     width: 60px;
     height: 30px;
@@ -335,7 +430,7 @@ display:flex;
     position: relative;
 }
 
-.button1{
+.button9{
     width: 60px;
     height: 30px;
     background-color: #c7c7c7;
@@ -343,6 +438,35 @@ display:flex;
     cursor: pointer;
     position: relative;
 }
+
+.button10{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button11{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button12{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Toggle buttons */
 
 .button1::before{
     content: "";
@@ -439,6 +563,57 @@ display:flex;
     left: 0;
     transition: all 0.3s ease;
 }
+
+.button9::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button10::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button11::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button12::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+/* Toggle buttons checked state */
+
 input:checked + .button1::before{
     transform: translateX(30px);
     background-color: #1f2937;
@@ -479,7 +654,43 @@ input:checked + .button8::before{
     background-color: #1f2937;
 }
 
+input:checked + .button9::before{
+    transform: translateX(30px);
+        background-color: #1f2937;
+}
+    
+input:checked + .button10::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button11::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button12::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+.accordion1{
+    width: 100%;
+    color:rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    bottom: 100px;
+}
+
 .accordion2{
+    width: 100%;
+    color:rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    bottom: 100px;
+}
+
+.accordion3{
     width: 100%;
     color:rgb(0, 0, 0);
     display: flex;

@@ -20,3 +20,14 @@ items2.forEach(header => {
         item.classList.toggle("active");
     });
 });
+
+const items3 = document.querySelectorAll(".accordion-header3");
+
+items3.forEach(header => {
+    header.addEventListener("click", () => {
+
+        const item = header.parentElement;
+
+        item.classList.toggle("active");
+    });
+});
