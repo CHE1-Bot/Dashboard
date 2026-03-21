@@ -103,16 +103,16 @@ display:flex;
 flex-direction:column; /* TÄRKEIN */
 }
 
-.accordion{
+.accordion1{
 width:100%;
 color:rgb(0, 0, 0);
 }
 
-.accordion-item{
+.accordion-item1{
 border-bottom:1px solid rgba(255,255,255,0.1);
 }
 
-.accordion-header{
+.accordion-header1{
 cursor:pointer;
 padding:15px;
 font-weight:bold;
@@ -121,11 +121,40 @@ align-items:center;
 justify-content:space-between;
 }
 
-.accordion-header:hover{
+.accordion-header1:hover{
 background:rgba(255,255,255,0.05);
 }
 
-.accordion-content{
+.accordion-content1{
+max-height:0;
+overflow:hidden;
+transition:all 0.3s ease;
+padding:0 15px;
+}
+
+.accordion2{
+width:100%;
+color:rgb(0, 0, 0);
+}
+
+.accordion-item2{
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.accordion-header2{
+cursor:pointer;
+padding:15px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.accordion-header2:hover{
+background:rgba(255,255,255,0.05);
+}
+
+.accordion-content2{
 max-height:0;
 overflow:hidden;
 transition:all 0.3s ease;
@@ -133,12 +162,22 @@ padding:0 15px;
 }
 
 /* open state */
-.accordion-item.active .accordion-content{
+.accordion-item1.active .accordion-content1{
 max-height:500px; /* riittää */
 padding:15px;
 }
 
 .content1{
+flex:1;
+display:flex;
+}
+
+.accordion-item2.active .accordion-content2{
+max-height:500px; /* riittää */
+padding:15px;
+}
+
+.content2{
 flex:1;
 display:flex;
 }
@@ -188,6 +227,114 @@ display:flex;
     background-color: #f4f6fb;
 }
 
+#check-button5{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button6{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button7{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button8{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+.button1{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button2{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button3{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button4{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button5{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button6{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button7{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button8{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
 .button1{
     width: 60px;
     height: 30px;
@@ -209,9 +356,135 @@ display:flex;
     transition: all 0.3s ease;
 }
 
+.button2::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button3::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button4::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button5::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button6::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button7::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button8::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
 input:checked + .button1::before{
     transform: translateX(30px);
     background-color: #1f2937;
+}
+
+input:checked + .button2::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button3::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button4::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button5::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button6::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button7::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button8::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+.accordion2{
+    width: 100%;
+    color:rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    bottom: 100px;
 }
 
 input{
