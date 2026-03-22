@@ -1,0 +1,720 @@
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#f4f6fb;
+}
+
+/* LAYOUT */
+
+.dashboard{
+display:flex;
+height:100vh;
+}
+
+
+/* LEFT SIDEBAR */
+
+.sidebar{
+width:230px;
+background:#111827;
+color:white;
+
+display:flex;
+flex-direction:column;
+padding:20px;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:40px;
+}
+
+.logo-img{
+width:40px;
+height:40px;
+border-radius:50%;
+}
+
+.sidebar nav{
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.sidebar a{
+color:#c7c7c7;
+text-decoration:none;
+padding:10px;
+border-radius:8px;
+}
+
+.sidebar a:hover{
+background:#1f2937;
+color:white;
+}
+
+#Tickets{
+background:#1f2937;
+}
+
+/* RIGHT SIDEBAR */
+.right-sidebar{
+position:fixed;
+right: 10px;
+top:200px;
+width:230px;
+height: 400px;
+background:#111827;
+color:white;
+display:flex;
+flex-direction:column;
+padding:20px;
+border-radius: 10px;
+}
+
+.right-sidebar nav{
+display:flex;
+flex-direction:column;
+gap:15px;
+}
+
+.right-sidebar a{
+color:#c7c7c7;
+text-decoration:none;
+padding:10px;
+border-radius:8px;
+}
+
+.right-sidebar a:hover{
+background:#1f2937;
+color:white;
+}
+
+#Settings{
+background:#1f2937;
+}
+/* MAIN */
+
+.main{
+flex:1;
+display:flex;
+flex-direction:column; /* TÄRKEIN */
+}
+
+.content{
+    display: flex;
+    flex-direction: column; /* TÄRKEIN */
+    gap: 10px; /* väli accordionien väliin */
+}
+
+/* ACCORDION */
+
+.accordion1{
+width:100%;
+color:rgb(0, 0, 0);
+}
+
+.accordion-item1{
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.accordion-header1{
+cursor:pointer;
+padding:15px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.accordion-header1:hover{
+background:rgba(255,255,255,0.05);
+}
+
+.accordion-content1{
+max-height:0;
+overflow:hidden;
+transition:all 0.3s ease;
+padding:0 15px;
+}
+
+.accordion2{
+width:100%;
+color:rgb(0, 0, 0);
+}
+
+.accordion-item2{
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.accordion-header2{
+cursor:pointer;
+padding:15px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.accordion-header2:hover{
+background:rgba(255,255,255,0.05);
+}
+
+.accordion-content2{
+max-height:0;
+overflow:hidden;
+transition:all 0.3s ease;
+padding:0 15px;
+}
+
+.accordion3{
+width:100%;
+color:rgb(0, 0, 0);
+}
+
+.accordion-item3{
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.accordion-header3{
+cursor:pointer;
+padding:15px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.accordion-header3:hover{
+background:rgba(255,255,255,0.05);
+}
+
+.accordion-content3{
+max-height:0;
+overflow:hidden;
+transition:all 0.3s ease;
+padding:0 15px;
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 500px;
+}
+
+/* open state */
+
+.accordion-item1.active .accordion-content1{
+max-height:500px; /* riittää */
+padding:15px;
+}
+
+.content1{
+display:flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.accordion-item2.active .accordion-content2{
+max-height:500px; /* riittää */
+padding:15px;
+}
+
+.content2{
+display:flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.accordion-item3.active .accordion-content3{
+max-height:500px; /* riittää */
+padding:15px;
+}
+
+.content3{
+display:flex;
+flex-direction: column;
+gap: 10px;
+}
+
+/* CHECK BUTTONS */
+
+#check-button1{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button2{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button3{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button3{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button4{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button5{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button6{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button7{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button8{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button9{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button10{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button11{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button12{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+/* Toggle buttons */
+
+.button1{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button2{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button3{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button4{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button5{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button6{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button7{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button8{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button9{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button10{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button11{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button12{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Toggle buttons */
+
+.button1::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button2::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button3::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button4::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button5::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button6::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button7::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button8::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button9::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button10::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button11::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button12::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+/* Toggle buttons checked state */
+
+input:checked + .button1::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button2::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button3::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button4::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button5::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button6::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button7::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button8::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button9::before{
+    transform: translateX(30px);
+        background-color: #1f2937;
+}
+    
+input:checked + .button10::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button11::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button12::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+.accordion1{
+    width: 100%;
+    color:rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    bottom: 100px;
+}
+
+.accordion2{
+    width: 100%;
+    color:rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    bottom: 100px;
+}
+
+.accordion3{
+    width: 100%;
+    color:rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    bottom: 100px;
+}
+
+input{
+    display: none;
+}
+/* TOPBAR */
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+padding:20px 40px;
+background:white;
+border-bottom:1px solid #eee;
+}
+
+.user img{
+width:40px;
+height:40px;
+border-radius:50%;
+}
