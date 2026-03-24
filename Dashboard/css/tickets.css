@@ -198,6 +198,35 @@ transition:all 0.3s ease;
 padding:0 15px;
 }
 
+.accordion4{
+width:100%;
+color:rgb(0, 0, 0);
+}
+
+.accordion-item4{
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.accordion-header4{
+cursor:pointer;
+padding:15px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.accordion-header4:hover{
+background:rgba(255,255,255,0.05);
+}
+
+.accordion-content4{
+max-height:0;
+overflow:hidden;
+transition:all 0.3s ease;
+padding:0 15px;
+}
+
 .accordion-item.active .accordion-content {
     max-height: 500px;
 }
@@ -232,6 +261,17 @@ padding:15px;
 }
 
 .content3{
+display:flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.accordion-item4.active .accordion-content4{
+max-height:500px; /* riittää */
+padding:15px;
+}
+
+.content4{
 display:flex;
 flex-direction: column;
 gap: 10px;
@@ -356,6 +396,42 @@ gap: 10px;
     background-color: #f4f6fb;
 }
 
+#check-button13{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button14{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button15{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
+#check-button16{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6fb;
+}
+
 /* Toggle buttons */
 
 .button1{
@@ -458,6 +534,42 @@ gap: 10px;
 }
 
 .button12{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button13{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button14{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button15{
+    width: 60px;
+    height: 30px;
+    background-color: #c7c7c7;
+    border-radius: 15px;
+    cursor: pointer;
+    position: relative;
+}
+
+.button16{
     width: 60px;
     height: 30px;
     background-color: #c7c7c7;
@@ -612,6 +724,54 @@ gap: 10px;
     transition: all 0.3s ease;
 }
 
+.button13::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button14::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button15::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.button16::before{
+    content: "";
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
 /* Toggle buttons checked state */
 
 input:checked + .button1::before{
@@ -674,6 +834,26 @@ input:checked + .button12::before{
     background-color: #1f2937;
 }
 
+input:checked + .button13::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button14::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button15::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
+input:checked + .button16::before{
+    transform: translateX(30px);
+    background-color: #1f2937;
+}
+
 .accordion1{
     width: 100%;
     color:rgb(0, 0, 0);
@@ -698,9 +878,18 @@ input:checked + .button12::before{
     bottom: 100px;
 }
 
+.accordion4{
+    width: 100%;
+    color:rgb(0, 0, 0);
+    display: flex;
+    flex-direction: column;
+    bottom: 100px;
+}
+
 input{
     display: none;
 }
+
 /* TOPBAR */
 
 .topbar{

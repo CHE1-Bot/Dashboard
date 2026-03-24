@@ -31,3 +31,25 @@ items3.forEach(header => {
         item.classList.toggle("active");
     });
 });
+
+const items4 = document.querySelectorAll(".accordion-header4");
+
+items4.forEach(header => {
+    header.addEventListener("click", () => {
+
+        const item = header.parentElement;
+
+        item.classList.toggle("active");
+    });
+});
+
+const items5 = document.querySelectorAll(".accordion-header5");
+
+items5.forEach(header => {
+    header.addEventListener("click", () => {
+
+        const item = header.parentElement;
+
+        item.classList.toggle("active");
+    });
+});
