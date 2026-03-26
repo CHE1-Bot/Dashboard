@@ -53,3 +53,11 @@ items5.forEach(header => {
         item.classList.toggle("active");
     });
 });
+
+document.querySelectorAll(".dropdown-button").forEach(button => {
+    button.addEventListener("click", () => {
+        const dropdown = button.parentElement;
+        dropdown.classList.toggle("active");
+    });
+});
+
