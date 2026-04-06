@@ -5,9 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Che1 Dashboard</title>
+<title>Che1 Dashboard - Forms</title>
 
-<link rel="stylesheet" href="../../css//tickets/forms.css">
+<link rel="stylesheet" href="../../css/tickets/tickets.css">
 
 <script src="https://kit.fontawesome.com/89f758f97e.js" crossorigin="anonymous"></script>
 </head>
@@ -28,19 +28,19 @@
 
 <nav>
 
-<a href="#"><i class="fa-solid fa-chart-line"></i> Overview</a>
+<a href="../overview/overview.html"><i class="fa-solid fa-chart-line"></i> Overview</a>
 
-<a href="#"><i class="fa-solid fa-server"></i> Servers</a>
+<a href="../servers/servers.html"><i class="fa-solid fa-server"></i> Servers</a>
 
-<a href="#" id="Tickets"><i class="fa-solid fa-ticket"></i> Tickets</a>
+<a href="tickets.html" id="Tickets"><i class="fa-solid fa-ticket"></i> Tickets</a>
 
-<a href="#"><i class="fa-solid fa-gift"></i> Giveaways</a>
+<a href="../giveaways/giveaway.html"><i class="fa-solid fa-gift"></i> Giveaways</a>
 
-<a href="#"><i class="fa-solid fa-shield"></i> Moderation</a>
+<a href="../moderation/moderation.html"><i class="fa-solid fa-shield"></i> Moderation</a>
 
 <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
 
-<a href="#"><i class="fa-solid fa-ranking-star"></i> Leveling</a>
+<a href="../Leveling/leveling.html"><i class="fa-solid fa-ranking-star"></i> Leveling</a>
 
 </nav>
 
@@ -55,7 +55,7 @@
 
 <header class="topbar">
 
-<h2>Tickets</h2>
+<h2>Forms</h2>
 
 <div class="user">
 
@@ -70,68 +70,92 @@
     <div class="accordion1">
         <div class="accordion-item1">
             <div class="accordion-header1">
-                <h3>Embed</h3>
+                <h3>Form Settings</h3>
             </div>
                 <div class="accordion-content1" id="content1">
                     <div class="ticket-overview" id="check-button1">
+                        <h3 class="accordion1-texts">Enable Forms</h3>
                         <input type="checkbox" id="check1">
                         <label for="check1" class="button1"></label>
                     </div>
                     <div class="ticket-overview" id="check-button2">
+                        <h3 class="accordion1-texts">Require Email</h3>
                         <input type="checkbox" id="check2">
                         <label for="check2" class="button2"></label>
                     </div>
-
                     <div class="ticket-overview" id="check-button3">
+                        <h3 class="accordion1-texts">Custom Fields</h3>
                         <input type="checkbox" id="check3">
                         <label for="check3" class="button3"></label>
                     </div>
                     <div class="ticket-overview" id="check-button4">
+                        <h3 class="accordion1-texts">Form Validation</h3>
                         <input type="checkbox" id="check4">
                         <label for="check4" class="button4"></label>
                     </div>
                 </div>
             </div>
         </div>
-    <div>
-        <div class="accordion2">
-            <div class="accordion-items2">
-                <div class="accordion-header2">
-                    <h3>Preview</h3>
-                </div>
-                <div class="accordion-content2">
-
+    <div class="accordion2">
+        <div class="accordion-item2">
+            <div class="accordion-header2">
+                <h3>Submission</h3>
+            </div>
+                <div class="accordion-content2" id="content2">
+                    <div class="ticket-overview" id="check-button5">
+                        <h3 class="accordion1-texts">Auto Respond</h3>
+                        <input type="checkbox" id="check5">
+                        <label for="check5" class="button5"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button6">
+                        <h3 class="accordion1-texts">Store Responses</h3>
+                        <input type="checkbox" id="check6">
+                        <label for="check6" class="button6"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button7">
+                        <h3 class="accordion1-texts">Notify Staff</h3>
+                        <input type="checkbox" id="check7">
+                        <label for="check7" class="button7"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button8">
+                        <h3 class="accordion1-texts">Export Data</h3>
+                        <input type="checkbox" id="check8">
+                        <label for="check8" class="button8"></label>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
+
 <!-- right sidebar -->
 
 <aside class="right-sidebar">
+
 <nav>
 
-    <a href="#" id="Settings"><i class="fa-solid fa-gears"></i>Settings</a>
+    <a href="tickets.html"><i class="fa-solid fa-gears"></i>Settings</a>
 
-    <a href="#" id="Embed"><i class="fa-regular fa-message"></i>Embed</a>
+    <a href="ticket_embed.html"><i class="fa-regular fa-message"></i>Embed</a>
 
-    <a href="#" id="Staff"><i class="fa-solid fa-people-group"></i>Ticket Staff</a>
+    <a href="ticket_staff.html"><i class="fa-solid fa-people-group"></i>Ticket Staff</a>
 
-    <a href="#"><i class="fa-solid fa-file"></i>Transcripts</a>
+    <a href="transcripts.html"><i class="fa-solid fa-file"></i>Transcripts</a>
 
-    <a href="#"><i class="fa-solid fa-arrow-pointer"></i>Panels</a>
+    <a href="panels.html"><i class="fa-solid fa-arrow-pointer"></i>Panels</a>
 
-    <a href="#"><i class="fa-solid fa-file-lines"></i>Forms</a>
+    <a href="forms.html" id="Settings"><i class="fa-solid fa-file-lines"></i>Forms</a>
 
-    <a href="#"><i class="fa-solid fa-tag"></i>Tags</a>
+    <a href="tags.html"><i class="fa-solid fa-tag"></i>Tags</a>
 
-    <a href="#"><i class="fa-solid fa-file-medical"></i>Audit logs</a>
+    <a href="audit_logs.html"><i class="fa-solid fa-file-medical"></i>Audit logs</a>
 
 </nav>
 
 </aside>
 
 <script src="../../js/accordion.js"></script>
+
 </body>
+
 </html>

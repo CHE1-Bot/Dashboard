@@ -188,14 +188,85 @@ flex-direction: row;
 max-height:500px; /* riittää */
 padding:15px;
 }
+.content{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
 
-.content1,
-.content2,
-.content3,
-.content4{
-display:flex;
-flex-direction: row;
-gap: 10px;
+.transcripts{
+    display:flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.search-section {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.search-input {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ticket-id {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 200px;
+}
+
+.search-btn {
+    padding: 10px 20px;
+    background: #111827;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.search-btn:hover {
+    background: #1f2937;
+}
+
+.transcripts-list {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-height: 400px;
+    padding: 20px;
+}
+
+.transcript-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.transcript-item:last-child {
+    border-bottom: none;
+}
+
+.transcript-item h3 {
+    margin: 0 0 10px 0;
+    color: #111827;
+}
+
+.transcript-content {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    font-family: monospace;
 }
 
 /* CHECK BUTTONS */
@@ -384,7 +455,7 @@ input{
 
 .arrow {
     margin-left: 8px;
-    transition: transform 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .dropdown.active .arrow {
@@ -392,6 +463,16 @@ input{
 }
 
 /* TEXTS */
+
+.text.inpu{
+    display: flex;
+    flex-direction: row;
+}
+
+.ticket-id{
+    display: row;
+    background-color: #111827;
+}
 
 .ticket-overview {
     display: flex;

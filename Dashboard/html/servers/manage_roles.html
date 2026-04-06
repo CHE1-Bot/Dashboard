@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Che1 Dashboard - Manage Roles</title>
+
+<link rel="stylesheet" href="../../css/tickets/tickets.css">
+
+<script src="https://kit.fontawesome.com/89f758f97e.js" crossorigin="anonymous"></script>
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="logo">
+<img src="../../../src/images/Che1logo.png" class="logo-img">
+<span>Che1</span>
+</div>
+
+<nav>
+
+<a href="../overview/overview.html"><i class="fa-solid fa-chart-line"></i> Overview</a>
+
+<a href="servers.html" id="Servers"><i class="fa-solid fa-server"></i> Servers</a>
+
+<a href="../tickets/tickets.html"><i class="fa-solid fa-ticket"></i> Tickets</a>
+
+<a href="../giveaways/giveaway.html"><i class="fa-solid fa-gift"></i> Giveaways</a>
+
+<a href="../moderation/moderation.html"><i class="fa-solid fa-shield"></i> Moderation</a>
+
+<a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+
+<a href="../Leveling/leveling.html"><i class="fa-solid fa-ranking-star"></i> Leveling</a>
+
+</nav>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+<!-- TOPBAR -->
+
+<header class="topbar">
+
+<h2>Manage Roles</h2>
+
+<div class="user">
+
+<img src="https://cdn.discordapp.com/embed/avatars/0.png">
+
+</div>
+
+</header>
+
+<!-- CONTENT -->
+<div class="content">
+    <div class="accordion1">
+        <div class="accordion-item1">
+            <div class="accordion-header1">
+                <h3>Create Role</h3>
+            </div>
+                <div class="accordion-content1" id="content1">
+                    <div class="ticket-overview">
+                        <h3 class="accordion1-texts">Role Name</h3>
+                        <input type="text" placeholder="Enter role name">
+                    </div>
+                    <div class="ticket-overview">
+                        <h3 class="accordion1-texts">Color</h3>
+                        <input type="color">
+                    </div>
+                    <div class="ticket-overview" id="check-button1">
+                        <h3 class="accordion1-texts">Mentionable</h3>
+                        <input type="checkbox" id="check1">
+                        <label for="check1" class="button1"></label>
+                    </div>
+                    <button class="btn">Create Role</button>
+                </div>
+            </div>
+        </div>
+    <div class="accordion2">
+        <div class="accordion-item2">
+            <div class="accordion-header2">
+                <h3>Edit Roles</h3>
+            </div>
+                <div class="accordion-content2" id="content2">
+                    <div class="ticket-overview">
+                        <h3 class="accordion1-texts">Select Role</h3>
+                        <select>
+                            <option>Admin</option>
+                            <option>Moderator</option>
+                            <option>Member</option>
+                        </select>
+                    </div>
+                    <button class="btn">Edit Role</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- right sidebar -->
+
+<aside class="right-sidebar">
+
+<nav>
+
+    <a href="add_server.html"><i class="fa-solid fa-plus"></i> Add Server</a>
+
+    <a href="manage_roles.html" id="Settings"><i class="fa-solid fa-users-cog"></i> Manage Roles</a>
+
+    <a href="permissions.html"><i class="fa-solid fa-key"></i> Permissions</a>
+
+    <a href="backup.html"><i class="fa-solid fa-save"></i> Backup</a>
+
+</nav>
+
+</aside>
+
+<script src="../../js/accordion.js"></script>
+
+</body>
+
+</html>

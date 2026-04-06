@@ -7,7 +7,7 @@
 
 <title>Che1 Dashboard</title>
 
-<link rel="stylesheet" href="../css/Dashboard.css">
+<link rel="stylesheet" href="../css/tickets/tickets.css">
 
 <script src="https://kit.fontawesome.com/89f758f97e.js" crossorigin="anonymous"></script>
 </head>
@@ -28,19 +28,19 @@
 
 <nav>
 
-<a href="#"><i class="fa-solid fa-chart-line"></i> Overview</a>
+<a href="overview/overview.html"><i class="fa-solid fa-chart-line"></i> Overview</a>
 
-<a href="#"><i class="fa-solid fa-server"></i> Servers</a>
+<a href="servers/servers.html"><i class="fa-solid fa-server"></i> Servers</a>
 
-<a href="#"><i class="fa-solid fa-ticket"></i> Tickets</a>
+<a href="tickets/tickets.html"><i class="fa-solid fa-ticket"></i> Tickets</a>
 
-<a href="#"><i class="fa-solid fa-gift"></i> Giveaways</a>
+<a href="giveaways/giveaway.html"><i class="fa-solid fa-gift"></i> Giveaways</a>
 
-<a href="#"><i class="fa-solid fa-shield"></i> Moderation</a>
+<a href="moderation/moderation.html"><i class="fa-solid fa-shield"></i> Moderation</a>
 
-<a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+<a href="../dashboard.html" id="Dashboard"><i class="fa-solid fa-gear"></i> Settings</a>
 
-<a href="#"><i class="fa-solid fa-ranking-star"></i> Leveling</a>
+<a href="Leveling/leveling.html"><i class="fa-solid fa-ranking-star"></i> Leveling</a>
 
 </nav>
 
@@ -65,45 +65,71 @@
 
 </header>
 
-
 <!-- CONTENT -->
-
 <div class="content">
-
-<h1>Welcome to Che1 Dashboard</h1>
-
-<p>Let's get started!</p>
-
-
-<div class="cards">
-
-<div class="card">
-        <h3>Settings</h3>
-        <p>Manage your Discord server settings.</p>
+    <div class="accordion1">
+        <div class="accordion-item1">
+            <div class="accordion-header1">
+                <h3>Quick Actions</h3>
+            </div>
+                <div class="accordion-content1" id="content1">
+                    <div class="ticket-overview" id="check-button1">
+                        <h3 class="accordion1-texts">Enable All Features</h3>
+                        <input type="checkbox" id="check1">
+                        <label for="check1" class="button1"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button2">
+                        <h3 class="accordion1-texts">Auto Setup</h3>
+                        <input type="checkbox" id="check2">
+                        <label for="check2" class="button2"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button3">
+                        <h3 class="accordion1-texts">Backup Data</h3>
+                        <input type="checkbox" id="check3">
+                        <label for="check3" class="button3"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button4">
+                        <h3 class="accordion1-texts">Reset Settings</h3>
+                        <input type="checkbox" id="check4">
+                        <label for="check4" class="button4"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="accordion2">
+        <div class="accordion-item2">
+            <div class="accordion-header2">
+                <h3>System Status</h3>
+            </div>
+                <div class="accordion-content2" id="content2">
+                    <div class="ticket-overview" id="check-button5">
+                        <h3 class="accordion1-texts">Bot Online</h3>
+                        <input type="checkbox" id="check5" checked disabled>
+                        <label for="check5" class="button5"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button6">
+                        <h3 class="accordion1-texts">Database Connected</h3>
+                        <input type="checkbox" id="check6" checked disabled>
+                        <label for="check6" class="button6"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button7">
+                        <h3 class="accordion1-texts">API Active</h3>
+                        <input type="checkbox" id="check7" checked disabled>
+                        <label for="check7" class="button7"></label>
+                    </div>
+                    <div class="ticket-overview" id="check-button8">
+                        <h3 class="accordion1-texts">All Systems Go</h3>
+                        <input type="checkbox" id="check8" checked disabled>
+                        <label for="check8" class="button8"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<script src="../js/accordion.js"></script>
 
-
-<div class="card">
-        <h3>Tickets</h3>
-        <p>Configure ticket system.</p>
-</div>
-
-
-
-<div class="card">
-        <h3>Moderation</h3>
-        <p>Set moderation tools.</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<script src="../js/dashboard.js"></script>
 </body>
+
 </html>
