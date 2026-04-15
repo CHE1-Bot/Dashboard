@@ -112,7 +112,8 @@ export const routes = {
     ]),
   },
 
-  'overview/alerts': {
+  ''overview/alerts': {': {
+    componentName: 'OverviewAlerts',
     pageTitle: 'Alerts',
     sidebarActive: 'Overview',
     contentHtml: settingsPage('Alerts', [
@@ -133,7 +134,8 @@ export const routes = {
     ]),
   },
 
-  'overview/history': {
+  ''overview/history': {': {
+    componentName: 'OverviewHistory',
     pageTitle: 'History',
     sidebarActive: 'Overview',
     contentHtml: settingsPage('History', [
@@ -166,7 +168,8 @@ export const routes = {
     ]),
   },
 
-  'overview/settings': {
+  ''overview/settings': {': {
+    componentName: 'OverviewSettings',
     pageTitle: 'Settings',
     sidebarActive: 'Overview',
     contentHtml: settingsPage('Settings', [
@@ -209,7 +212,8 @@ export const routes = {
     ]),
   },
 
-  'overview/statistics': {
+  ''overview/statistics': {': {
+    componentName: 'OverviewStatistics',
     pageTitle: 'Statistics',
     sidebarActive: 'Overview',
     contentHtml: settingsPage('Statistics', [
@@ -230,7 +234,8 @@ export const routes = {
     ]),
   },
 
-  'servers/servers': {
+  ''servers/servers': {': {
+    componentName: 'ServersServers',
     pageTitle: 'Servers',
     sidebarActive: 'Servers',
     contentHtml: settingsPage('Servers', [
@@ -251,7 +256,8 @@ export const routes = {
     ]),
   },
 
-  'servers/add-server': {
+  ''servers/add-server': {': {
+    componentName: 'ServersAdd-server',
     pageTitle: 'Add Server',
     sidebarActive: 'Servers',
     contentHtml: settingsPage('Add Server', [
@@ -297,7 +303,8 @@ export const routes = {
     ]),
   },
 
-  'servers/backup': {
+  ''servers/backup': {': {
+    componentName: 'ServersBackup',
     pageTitle: 'Backup',
     sidebarActive: 'Servers',
     contentHtml: settingsPage('Backup', [
@@ -343,7 +350,8 @@ export const routes = {
     ]),
   },
 
-  'servers/manage-roles': {
+  ''servers/manage-roles': {': {
+    componentName: 'ServersManage-roles',
     pageTitle: 'Manage Roles',
     sidebarActive: 'Servers',
     contentHtml: settingsPage('Manage Roles', [
@@ -389,7 +397,8 @@ export const routes = {
     ]),
   },
 
-  'servers/permissions': {
+  ''servers/permissions': {': {
+    componentName: 'ServersPermissions',
     pageTitle: 'Permissions',
     sidebarActive: 'Servers',
     contentHtml: settingsPage('Permissions', [
@@ -453,7 +462,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/tickets': {
+  ''tickets/tickets': {': {
+    componentName: 'TicketsTickets',
     pageTitle: 'Tickets',
     sidebarActive: 'Tickets',
     contentHtml: `
@@ -536,7 +546,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/audit-logs': {
+  ''tickets/audit-logs': {': {
+    componentName: 'TicketsAudit-logs',
     pageTitle: 'Audit Logs',
     sidebarActive: 'Tickets',
     contentHtml: settingsPage('Audit Logs', [
@@ -561,7 +572,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/forms': {
+  ''tickets/forms': {': {
+    componentName: 'TicketsForms',
     pageTitle: 'Forms',
     sidebarActive: 'Tickets',
     contentHtml: settingsPage('Forms', [
@@ -586,7 +598,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/panels': {
+  ''tickets/panels': {': {
+    componentName: 'TicketsPanels',
     pageTitle: 'Panels',
     sidebarActive: 'Tickets',
     contentHtml: settingsPage('Panels', [
@@ -611,7 +624,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/tags': {
+  ''tickets/tags': {': {
+    componentName: 'TicketsTags',
     pageTitle: 'Tags',
     sidebarActive: 'Tickets',
     contentHtml: settingsPage('Tags', [
@@ -636,7 +650,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/ticket-embed': {
+  ''tickets/ticket-embed': {': {
+    componentName: 'TicketsTicket-embed',
     pageTitle: 'Ticket Embed',
     sidebarActive: 'Tickets',
     contentHtml: settingsPage('Ticket Embed', [
@@ -661,7 +676,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/ticket-staff': {
+  ''tickets/ticket-staff': {': {
+    componentName: 'TicketsTicket-staff',
     pageTitle: 'Ticket Staff',
     sidebarActive: 'Tickets',
     contentHtml: settingsPage('Ticket Staff', [
@@ -686,7 +702,8 @@ export const routes = {
     ]),
   },
 
-  'tickets/transcripts': {
+  ''tickets/transcripts': {': {
+    componentName: 'TicketsTranscripts',
     pageTitle: 'Transcripts',
     sidebarActive: 'Tickets',
     contentHtml: `
@@ -725,7 +742,8 @@ export const routes = {
     ]),
   },
 
-  'giveaways/giveaway': {
+  ''giveaways/giveaway': {': {
+    componentName: 'GiveawaysGiveaway',
     pageTitle: 'Giveaways',
     sidebarActive: 'Giveaways',
     contentHtml: settingsPage('Giveaways', [
@@ -746,7 +764,8 @@ export const routes = {
     ]),
   },
 
-  'giveaways/active-giveaways': {
+  ''giveaways/active-giveaways': {': {
+    componentName: 'GiveawaysActive-giveaways',
     pageTitle: 'Active Giveaways',
     sidebarActive: 'Giveaways',
     contentHtml: settingsPage('Active Giveaways', [
@@ -799,7 +818,8 @@ export const routes = {
     ]),
   },
 
-  'giveaways/blacklist': {
+  ''giveaways/blacklist': {': {
+    componentName: 'GiveawaysBlacklist',
     pageTitle: 'Blacklist',
     sidebarActive: 'Giveaways',
     contentHtml: settingsPage('Blacklist', [
@@ -844,7 +864,8 @@ export const routes = {
     ]),
   },
 
-  'giveaways/create-giveaway': {
+  ''giveaways/create-giveaway': {': {
+    componentName: 'GiveawaysCreate-giveaway',
     pageTitle: 'Create Giveaway',
     sidebarActive: 'Giveaways',
     contentHtml: settingsPage('Create Giveaway', [
@@ -894,7 +915,8 @@ export const routes = {
     ]),
   },
 
-  'giveaways/premium': {
+  ''giveaways/premium': {': {
+    componentName: 'GiveawaysPremium',
     pageTitle: 'Premium',
     sidebarActive: 'Giveaways',
     contentHtml: settingsPage('Premium', [
@@ -941,7 +963,8 @@ export const routes = {
     ]),
   },
 
-  'moderation/moderation': {
+  ''moderation/moderation': {': {
+    componentName: 'ModerationModeration',
     pageTitle: 'Moderation',
     sidebarActive: 'Moderation',
     contentHtml: settingsPage('Moderation', [
@@ -962,7 +985,8 @@ export const routes = {
     ]),
   },
 
-  'moderation/auto-mod': {
+  ''moderation/auto-mod': {': {
+    componentName: 'ModerationAuto-mod',
     pageTitle: 'Auto Mod',
     sidebarActive: 'Moderation',
     contentHtml: settingsPage('Auto Mod', [
@@ -1003,7 +1027,8 @@ export const routes = {
     ]),
   },
 
-  'moderation/manual-actions': {
+  ''moderation/manual-actions': {': {
+    componentName: 'ModerationManual-actions',
     pageTitle: 'Manual Actions',
     sidebarActive: 'Moderation',
     contentHtml: settingsPage('Manual Actions', [
@@ -1044,7 +1069,8 @@ export const routes = {
     ]),
   },
 
-  'moderation/reports': {
+  ''moderation/reports': {': {
+    componentName: 'ModerationReports',
     pageTitle: 'Reports',
     sidebarActive: 'Moderation',
     contentHtml: settingsPage('Reports', [
@@ -1082,7 +1108,8 @@ export const routes = {
     ]),
   },
 
-  'moderation/logs': {
+  ''moderation/logs': {': {
+    componentName: 'ModerationLogs',
     pageTitle: 'Logs',
     sidebarActive: 'Moderation',
     contentHtml: settingsPage('Logs', [
@@ -1121,7 +1148,8 @@ export const routes = {
     ]),
   },
 
-  'leveling/leveling': {
+  ''leveling/leveling': {': {
+    componentName: 'LevelingLeveling',
     pageTitle: 'Leveling',
     sidebarActive: 'Leveling',
     contentHtml: settingsPage('Leveling', [
@@ -1142,7 +1170,8 @@ export const routes = {
     ]),
   },
 
-  'leveling/leaderboard': {
+  ''leveling/leaderboard': {': {
+    componentName: 'LevelingLeaderboard',
     pageTitle: 'Leaderboard',
     sidebarActive: 'Leveling',
     contentHtml: settingsPage('Leaderboard', [
@@ -1163,7 +1192,8 @@ export const routes = {
     ]),
   },
 
-  'leveling/rewards': {
+  ''leveling/rewards': {': {
+    componentName: 'LevelingRewards',
     pageTitle: 'Rewards',
     sidebarActive: 'Leveling',
     contentHtml: settingsPage('Rewards', [
@@ -1184,7 +1214,8 @@ export const routes = {
     ]),
   },
 
-  'leveling/stats': {
+  ''leveling/stats': {': {
+    componentName: 'LevelingStats',
     pageTitle: 'Stats',
     sidebarActive: 'Leveling',
     contentHtml: settingsPage('Leveling Stats', [

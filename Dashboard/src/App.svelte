@@ -5,6 +5,7 @@
   let hash = window.location.hash || '#/dashboard';
   let currentRoute = getRoute(hash);
   let route = routes[currentRoute] || routes.dashboard;
+  let Component;
 
   const defaultTranscripts = [
     { id: '001', content: 'Sample transcript content for ticket 001.' },
@@ -15,7 +16,21 @@
     hash = window.location.hash || '#/dashboard';
     currentRoute = getRoute(hash);
     route = routes[currentRoute] || routes.dashboard;
+    loadComponent();
     initializePage();
+  }
+
+  function loadComponent() {
+    if (route.componentName) {
+      import(`./components/${route.componentName}.svelte`).then(module => {
+        Component = module.default;
+      }).catch(err => {
+        console.error('Failed to load component', err);
+        Component = null;
+      });
+    } else {
+      Component = null;
+    }
   }
 
   function isSidebarActive(id) {
@@ -127,6 +142,7 @@
   onMount(() => {
     window.addEventListener('hashchange', updateRoute);
     initializePage();
+    loadComponent();
   });
 
   afterUpdate(() => {
@@ -159,7 +175,11 @@
     </header>
 
     <div class="content">
-      {@html route.contentHtml}
+      {#if Component}
+        <svelte:component this={Component} />
+      {:else}
+        {@html route.contentHtml}
+      {/if}
     </div>
   </div>
 
