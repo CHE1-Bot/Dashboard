@@ -1,7 +1,16 @@
 {
-  "dependencies": {
-    "express-session": "^1.19.0",
-    "passport": "^0.7.0",
-    "passport-discord": "^0.1.4"
+  "name": "che1-dashboard",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "svelte": "^5.55.3",
+    "vite": "^8.0.8"
   }
 }
