@@ -1,48 +1,47 @@
-
 <script>
-import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
+  import { currentGuildId } from '../../lib/stores.js';
+  import { guildApi } from '../../lib/api.js';
+  import Panel from '../../lib/Panel.svelte';
+  import StatCard from '../../lib/StatCard.svelte';
 
-onMount(() => {
-  document.querySelectorAll('.accordion-header1, .accordion-header2, .accordion-header3, .accordion-header4, .accordion-header5')
-    .forEach(header => {
-      header.addEventListener('click', () => {
-        header.parentElement.classList.toggle('active');
-      });
-    });
+  let data = null;
 
-  document.querySelectorAll('.dropdown-button').forEach(button => {
-    button.addEventListener('click', () => {
-      button.parentElement.classList.toggle('active');
-    });
-  });
-});
+  async function load() {
+    if (!$currentGuildId) return;
+    data = await guildApi($currentGuildId).get('/leveling/stats');
+  }
+  onMount(load);
+  $: if ($currentGuildId) load();
 </script>
 
-<div class="accordion1">
-    <div class="accordion-item1">
-        <div class="accordion-header1">
-                        <h3>Leveling System</h3>
-                    </div>
-        <div class="accordion-content1" id="content1">
-                            <div class="ticket-overview" id="check-button1">
-                                <h3 class="accordion1-texts">Enable Leveling</h3>
-                                <input type="checkbox" id="check1">
-                                <label for="check1" class="button1"></label>
-                            </div>
-</div>
-</div>
-</div>
-<div class="accordion2">
-    <div class="accordion-item2">
-        <div class="accordion-header2">
-                        <h3>Advanced Settings</h3>
-                    </div>
-        <div class="accordion-content2" id="content2">
-                            <div class="ticket-overview" id="check-button5">
-                                <h3 class="accordion1-texts">Multiplier Channels</h3>
-                                <input type="checkbox" id="check5">
-                                <label for="check5" class="button5"></label>
-                            </div>
-</div>
-</div>
-</div>
+{#if !data}<p>Loading…</p>{:else}
+  <div class="cards">
+    <StatCard label="Tracked users" value={data.tracked_users.toLocaleString()} icon="fa-users" />
+    <StatCard label="Top level" value={String(data.top_level)} icon="fa-crown" />
+    <StatCard label="Average XP" value={data.average_xp.toLocaleString()} icon="fa-chart-line" />
+    <StatCard label="Total XP awarded" value={data.total_xp.toLocaleString()} icon="fa-bolt" />
+  </div>
+
+  <Panel title="Level distribution">
+    <div class="dist">
+      {#each data.top_users.slice(0, 10) as u}
+        <div class="row">
+          <span class="name">{u.username}</span>
+          <div class="bar"><div style="width:{Math.min(100, u.level * 5)}%"></div></div>
+          <span class="lvl">Lv {u.level}</span>
+        </div>
+      {/each}
+    </div>
+  </Panel>
+{/if}
+
+<style>
+  .cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:14px; margin-bottom:20px; }
+  .dist { display:flex; flex-direction:column; gap:10px; }
+  .row { display:grid; grid-template-columns:120px 1fr 60px; gap:12px; align-items:center; font-size:13px; }
+  .name { color:#111827; font-weight:500; }
+  .bar { height:10px; background:#e5e7eb; border-radius:6px; overflow:hidden; }
+  .bar > div { height:100%; background:linear-gradient(90deg, #5865f2, #10b981); border-radius:6px; }
+  .lvl { color:#475569; text-align:right; }
+</style>
