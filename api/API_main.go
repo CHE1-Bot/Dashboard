@@ -1,19 +1,24 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
-	"io"
+	"errors"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // ---------------- Models (mirror Bot schema) ----------------
@@ -595,23 +600,95 @@ func (s *Store) seedGuild(gid string) {
 // ---------------- Globals ----------------
 
 var (
-	store       = newStore()
-	devMode     = envBool("DEV_MODE", true)
-	clientID    = os.Getenv("DISCORD_CLIENT_ID")
-	clientSec   = os.Getenv("DISCORD_CLIENT_SECRET")
-	redirectURI = getenv("DISCORD_REDIRECT_URI", "http://localhost:8080/api/auth/callback")
-	workerURL   = os.Getenv("WORKER_URL")
-	workerKey   = os.Getenv("WORKER_API_KEY")
-	frontendURL = getenv("FRONTEND_URL", "http://localhost:5173")
+	store           = newStore()
+	db              *DB
+	logger          = slog.New(slog.NewTextHandler(os.Stderr, nil))
+	devMode         bool
+	clientID        string
+	clientSec       string
+	redirectURI     string
+	workerURL       string
+	workerKey       string
+	frontendURL     string
+	botToken        string
+	dashboardAPIKey string
+	cookieSecure    bool
+	allowedOrigins  []string
 )
 
+func loadEnv() {
+	_ = godotenv.Load()
+	devMode = envBool("DEV_MODE", false)
+	clientID = os.Getenv("DISCORD_CLIENT_ID")
+	clientSec = os.Getenv("DISCORD_CLIENT_SECRET")
+	redirectURI = getenv("DISCORD_REDIRECT_URI", "http://localhost:8080/api/auth/callback")
+	workerURL = os.Getenv("WORKER_URL")
+	workerKey = os.Getenv("WORKER_API_KEY")
+	frontendURL = getenv("FRONTEND_URL", "http://localhost:5173")
+	botToken = os.Getenv("DISCORD_BOT_TOKEN")
+	dashboardAPIKey = os.Getenv("DASHBOARD_API_KEY")
+	cookieSecure = envBool("SESSION_SECURE_COOKIES", false)
+	if v := os.Getenv("ALLOWED_ORIGINS"); v != "" {
+		for _, o := range strings.Split(v, ",") {
+			allowedOrigins = append(allowedOrigins, strings.TrimSpace(o))
+		}
+	} else {
+		allowedOrigins = []string{frontendURL}
+	}
+}
+
 func main() {
+	loadEnv()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Postgres (optional — falls back to in-memory Store if unset).
+	var err error
+	db, err = openDB(ctx, os.Getenv("DATABASE_URL"))
+	if err != nil {
+		logger.Error("database open failed", "err", err.Error())
+		os.Exit(1)
+	}
+	if db != nil {
+		logger.Info("database connected", "max_conns", db.Pool.Config().MaxConns)
+	} else {
+		logger.Warn("DATABASE_URL not set — running with in-memory store (dev only)")
+	}
+
+	// Dev seed: only populate demo data when explicitly requested.
 	if devMode {
 		store.seed()
-		log.Println("DEV_MODE=true: seeded demo data (DevUser + 3 guilds)")
+		logger.Warn("DEV_MODE=true: seeded demo data (DevUser + 3 guilds) — do NOT run in production")
+	}
+
+	// Production safety warnings
+	if !devMode && (clientID == "" || clientSec == "") {
+		logger.Warn("DISCORD_CLIENT_ID/SECRET not set — login will fail")
+	}
+	if !devMode && dashboardAPIKey == "" {
+		logger.Warn("DASHBOARD_API_KEY not set — /api/bot endpoints are unauthenticated")
 	}
 
 	mux := http.NewServeMux()
+
+	// Health / readiness
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ok"))
+	})
+	mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		if db != nil {
+			pingCtx, c := context.WithTimeout(r.Context(), 2*time.Second)
+			defer c()
+			if err := db.Pool.Ping(pingCtx); err != nil {
+				writeErr(w, http.StatusServiceUnavailable, "db down: "+err.Error())
+				return
+			}
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ready"))
+	})
 
 	// Auth
 	mux.HandleFunc("/api/auth/login", handleLogin)
@@ -619,30 +696,88 @@ func main() {
 	mux.HandleFunc("/api/auth/logout", handleLogout)
 	mux.HandleFunc("/api/auth/me", handleMe)
 
-	// Guilds
+	// Guilds (user-session authenticated)
 	mux.HandleFunc("/api/guilds", handleGuilds)
 	mux.HandleFunc("/api/guilds/", handleGuildScoped)
 
-	// Static front-end (optional): serve built Vite output when present
-	mux.Handle("/", http.FileServer(http.Dir("../dist/")))
+	// Bot-facing API (Bearer DASHBOARD_API_KEY)
+	mux.HandleFunc("/api/bot/", handleBotRoutes)
+
+	// Static SPA (embedded dist + disk fallback)
+	mux.Handle("/", spaHandler())
 
 	addr := getenv("ADDR", ":8080")
-	log.Printf("CHE1 dashboard API listening on %s", addr)
-	log.Fatal(http.ListenAndServe(addr, withCORS(mux)))
+	srv := &http.Server{
+		Addr:              addr,
+		Handler:           withLogging(withCORS(mux)),
+		ReadHeaderTimeout: 10 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+
+	// Graceful shutdown
+	go func() {
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
+		<-sig
+		logger.Info("shutdown initiated")
+		shutdownCtx, c := context.WithTimeout(context.Background(), 15*time.Second)
+		defer c()
+		_ = srv.Shutdown(shutdownCtx)
+		if db != nil {
+			db.Pool.Close()
+		}
+		cancel()
+	}()
+
+	logger.Info("CHE1 dashboard API listening", "addr", addr, "dev_mode", devMode, "db", db != nil, "worker", workerURL != "")
+	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }
+
+func withLogging(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		sw := &statusWriter{ResponseWriter: w, status: 200}
+		h.ServeHTTP(sw, r)
+		logger.Info("http",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", sw.status,
+			"dur_ms", time.Since(start).Milliseconds(),
+		)
+	})
+}
+
+type statusWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (s *statusWriter) WriteHeader(c int) { s.status = c; s.ResponseWriter.WriteHeader(c) }
 
 // ---------------- HTTP helpers ----------------
 
 func withCORS(h http.Handler) http.Handler {
+	allow := make(map[string]struct{}, len(allowedOrigins))
+	for _, o := range allowedOrigins {
+		allow[o] = struct{}{}
+	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
-		if origin == "" {
-			origin = frontendURL
+		if origin != "" {
+			if _, ok := allow[origin]; ok {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Vary", "Origin")
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+				w.Header().Set("Access-Control-Max-Age", "600")
+			}
 		}
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Basic hardening
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
@@ -699,23 +834,41 @@ func isoDaysFromNow(n int) string {
 
 // ---------------- Auth ----------------
 
-const sidCookie = "che1_sid"
+const (
+	sidCookie   = "che1_sid"
+	stateCookie = "che1_state"
+)
 
 func setSession(w http.ResponseWriter, sid string) {
 	http.SetCookie(w, &http.Cookie{
-		Name: sidCookie, Value: sid, Path: "/", HttpOnly: true,
-		SameSite: http.SameSiteLaxMode, MaxAge: 60 * 60 * 24 * 7,
+		Name:     sidCookie,
+		Value:    sid,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   cookieSecure,
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   60 * 60 * 24 * 7,
 	})
 }
 
 func clearSession(w http.ResponseWriter) {
-	http.SetCookie(w, &http.Cookie{Name: sidCookie, Value: "", Path: "/", MaxAge: -1, HttpOnly: true})
+	http.SetCookie(w, &http.Cookie{
+		Name: sidCookie, Value: "", Path: "/", MaxAge: -1,
+		HttpOnly: true, Secure: cookieSecure, SameSite: http.SameSiteLaxMode,
+	})
 }
 
 func currentUser(r *http.Request) *User {
 	c, err := r.Cookie(sidCookie)
 	if err != nil {
 		return nil
+	}
+	// Try DB-backed sessions first
+	if db != nil && db.Pool != nil {
+		_, u := dbGetSession(r.Context(), c.Value)
+		if u != nil {
+			return u
+		}
 	}
 	store.mu.RLock()
 	defer store.mu.RUnlock()
@@ -736,11 +889,12 @@ func requireUser(w http.ResponseWriter, r *http.Request) *User {
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
-	if devMode {
-		// Auto-login as DevUser
-		store.mu.Lock()
+	// Dev stub only when explicitly enabled AND OAuth not configured.
+	if devMode && clientID == "" {
 		sid := randHex(24)
-		store.sessions[sid] = &Session{ID: sid, UserID: "100000000000000001", Expires: time.Now().Add(7 * 24 * time.Hour)}
+		sess := &Session{ID: sid, UserID: "100000000000000001", Expires: time.Now().Add(7 * 24 * time.Hour)}
+		store.mu.Lock()
+		store.sessions[sid] = sess
 		store.mu.Unlock()
 		setSession(w, sid)
 		http.Redirect(w, r, frontendURL+"/#/dashboard/servers/servers", http.StatusFound)
@@ -751,101 +905,96 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	state := randHex(16)
-	http.SetCookie(w, &http.Cookie{Name: "che1_state", Value: state, Path: "/", HttpOnly: true, MaxAge: 600})
+	http.SetCookie(w, &http.Cookie{
+		Name: stateCookie, Value: state, Path: "/api/auth/",
+		HttpOnly: true, Secure: cookieSecure, SameSite: http.SameSiteLaxMode, MaxAge: 600,
+	})
 	u := url.Values{}
 	u.Set("client_id", clientID)
 	u.Set("redirect_uri", redirectURI)
 	u.Set("response_type", "code")
 	u.Set("scope", "identify guilds")
 	u.Set("state", state)
+	u.Set("prompt", "none")
 	http.Redirect(w, r, "https://discord.com/oauth2/authorize?"+u.Encode(), http.StatusFound)
 }
 
 func handleCallback(w http.ResponseWriter, r *http.Request) {
-	if devMode {
-		handleLogin(w, r)
-		return
-	}
+	// CSRF: state cookie must match query string.
 	code := r.URL.Query().Get("code")
 	state := r.URL.Query().Get("state")
-	sc, err := r.Cookie("che1_state")
-	if err != nil || sc.Value != state {
+	sc, err := r.Cookie(stateCookie)
+	if err != nil || sc.Value == "" || sc.Value != state {
 		writeErr(w, http.StatusBadRequest, "invalid state")
 		return
 	}
-	// Exchange code
-	form := url.Values{}
-	form.Set("client_id", clientID)
-	form.Set("client_secret", clientSec)
-	form.Set("grant_type", "authorization_code")
-	form.Set("code", code)
-	form.Set("redirect_uri", redirectURI)
-	req, _ := http.NewRequest("POST", "https://discord.com/api/oauth2/token", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	resp, err := http.DefaultClient.Do(req)
+	// Clear the state cookie immediately
+	http.SetCookie(w, &http.Cookie{
+		Name: stateCookie, Value: "", Path: "/api/auth/", MaxAge: -1,
+		HttpOnly: true, Secure: cookieSecure, SameSite: http.SameSiteLaxMode,
+	})
+
+	if clientID == "" || clientSec == "" {
+		writeErr(w, http.StatusInternalServerError, "oauth not configured")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+
+	token, err := exchangeCode(ctx, code)
 	if err != nil {
-		writeErr(w, http.StatusBadGateway, err.Error())
+		logger.Warn("oauth exchange failed", "err", err.Error())
+		writeErr(w, http.StatusBadGateway, "oauth exchange failed")
 		return
 	}
-	defer resp.Body.Close()
-	var tok struct {
-		AccessToken string `json:"access_token"`
-		ExpiresIn   int    `json:"expires_in"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
-		writeErr(w, http.StatusBadGateway, err.Error())
-		return
-	}
-	// Fetch user
-	user, err := discordGet[User](tok.AccessToken, "/users/@me")
+	user, err := fetchMe(ctx, token)
 	if err != nil {
-		writeErr(w, http.StatusBadGateway, err.Error())
+		writeErr(w, http.StatusBadGateway, "user fetch failed")
 		return
 	}
-	guilds, err := discordGet[[]Guild](tok.AccessToken, "/users/@me/guilds")
+	guilds, err := fetchMyGuilds(ctx, token)
 	if err != nil {
-		writeErr(w, http.StatusBadGateway, err.Error())
+		writeErr(w, http.StatusBadGateway, "guilds fetch failed")
 		return
 	}
-	// Store
+
+	// Persist user + guilds + session.
+	if db != nil && db.Pool != nil {
+		if err := dbUpsertUser(ctx, user); err != nil {
+			logger.Warn("dbUpsertUser failed", "err", err.Error())
+		}
+	}
 	store.mu.Lock()
-	store.users[user.ID] = &user
+	store.users[user.ID] = user
 	ids := make([]string, 0, len(guilds))
-	for _, g := range guilds {
-		copy := g
-		store.guilds[g.ID] = &copy
+	for i := range guilds {
+		g := guilds[i]
+		store.guilds[g.ID] = &g
+		store.botGuilds[g.ID] = g.BotPresent
 		ids = append(ids, g.ID)
 	}
 	store.userGuilds[user.ID] = ids
 	sid := randHex(24)
-	store.sessions[sid] = &Session{ID: sid, UserID: user.ID, AccessToken: tok.AccessToken, Expires: time.Now().Add(7 * 24 * time.Hour)}
+	sess := &Session{ID: sid, UserID: user.ID, AccessToken: token, Expires: time.Now().Add(7 * 24 * time.Hour)}
+	store.sessions[sid] = sess
 	store.mu.Unlock()
+	if db != nil && db.Pool != nil {
+		if err := dbPutSession(ctx, sess); err != nil {
+			logger.Warn("dbPutSession failed", "err", err.Error())
+		}
+	}
+
 	setSession(w, sid)
 	http.Redirect(w, r, frontendURL+"/#/dashboard/servers/servers", http.StatusFound)
 }
 
-func discordGet[T any](token, path string) (T, error) {
-	var out T
-	req, _ := http.NewRequest("GET", "https://discord.com/api/v10"+path, nil)
-	req.Header.Set("Authorization", "Bearer "+token)
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return out, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 300 {
-		b, _ := io.ReadAll(resp.Body)
-		return out, fmt.Errorf("discord %d: %s", resp.StatusCode, string(b))
-	}
-	return out, json.NewDecoder(resp.Body).Decode(&out)
-}
-
 func handleLogout(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie(sidCookie)
-	if err == nil {
+	if c, err := r.Cookie(sidCookie); err == nil {
 		store.mu.Lock()
 		delete(store.sessions, c.Value)
 		store.mu.Unlock()
+		dbDeleteSession(r.Context(), c.Value)
 	}
 	clearSession(w)
 	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
@@ -1970,26 +2119,4 @@ func handleApplications(w http.ResponseWriter, r *http.Request, gid string, rem 
 	writeErr(w, http.StatusMethodNotAllowed, "")
 }
 
-// ---------------- Worker forward ----------------
-
-// forwardWorker sends an action event to the Worker service if configured.
-// In dev/without WORKER_URL it's a no-op.
-func forwardWorker(event, gid string, payload any) {
-	if workerURL == "" {
-		return
-	}
-	body, _ := json.Marshal(map[string]any{"event": event, "guild_id": gid, "payload": payload})
-	req, _ := http.NewRequest("POST", strings.TrimRight(workerURL, "/")+"/api/v1/tasks", strings.NewReader(string(body)))
-	req.Header.Set("Content-Type", "application/json")
-	if workerKey != "" {
-		req.Header.Set("Authorization", "Bearer "+workerKey)
-	}
-	go func() {
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			log.Printf("worker forward error: %v", err)
-			return
-		}
-		resp.Body.Close()
-	}()
-}
+// forwardWorker implementation lives in worker.go.

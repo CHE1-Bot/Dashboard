@@ -1,0 +1,80 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: che1
+      POSTGRES_PASSWORD: che1
+      POSTGRES_DB: che1
+    volumes:
+      - che1_pg:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U che1 -d che1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Optional: included for full-stack development. In production you will
+  # typically run Worker / Bot as their own deployments.
+  worker:
+    image: che1/worker:latest
+    profiles: [full]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      HTTP_LISTEN_ADDR: :8081
+      WS_LISTEN_ADDR:   :8090
+      GRPC_LISTEN_ADDR: :9090
+      DATABASE_URL:     postgres://che1:che1@postgres:5432/che1?sslmode=disable
+      INBOUND_API_KEY:  ${WORKER_API_KEY:?set WORKER_API_KEY in .env}
+      DASHBOARD_BASE_URL: http://dashboard:8080
+      DASHBOARD_API_KEY:  ${DASHBOARD_API_KEY:?set DASHBOARD_API_KEY in .env}
+      DASHBOARD_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:8080
+    ports:
+      - "8081:8081"
+      - "8090:8090"
+
+  bot:
+    image: che1/bot:latest
+    profiles: [full]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DISCORD_TOKEN:   ${DISCORD_BOT_TOKEN:?set DISCORD_BOT_TOKEN in .env}
+      GUILD_ID:        ${GUILD_ID:-}
+      POSTGRES_URL:    postgres://che1:che1@postgres:5432/che1?sslmode=disable
+      WORKER_URL:      http://worker:8081
+      WORKER_WS_URL:   ws://worker:8090/ws
+      WORKER_API_KEY:  ${WORKER_API_KEY:?set WORKER_API_KEY in .env}
+      DASHBOARD_URL:   http://dashboard:8080
+      DASHBOARD_API_KEY: ${DASHBOARD_API_KEY:?set DASHBOARD_API_KEY in .env}
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ADDR: :8080
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+      DEV_MODE: "false"
+      DATABASE_URL: postgres://che1:che1@postgres:5432/che1?sslmode=disable
+      DISCORD_CLIENT_ID:     ${DISCORD_CLIENT_ID:?set DISCORD_CLIENT_ID in .env}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?set DISCORD_CLIENT_SECRET in .env}
+      DISCORD_REDIRECT_URI:  ${DISCORD_REDIRECT_URI:-http://localhost:8080/api/auth/callback}
+      DISCORD_BOT_TOKEN:     ${DISCORD_BOT_TOKEN:?set DISCORD_BOT_TOKEN in .env}
+      WORKER_URL:        ${WORKER_URL:-http://worker:8081}
+      WORKER_API_KEY:    ${WORKER_API_KEY:?set WORKER_API_KEY in .env}
+      DASHBOARD_API_KEY: ${DASHBOARD_API_KEY:?set DASHBOARD_API_KEY in .env}
+      SESSION_SECURE_COOKIES: ${SESSION_SECURE_COOKIES:-false}
+    ports:
+      - "8080:8080"
+
+volumes:
+  che1_pg:

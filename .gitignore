@@ -1,6 +1,12 @@
 node_modules/
 .env
 .env.*
+!.env.example
 dist/
 build/
 .claude/
+
+# Go build artefacts
+api/che1-dashboard-api.exe
+api/che1-dashboard
+api/dist/
