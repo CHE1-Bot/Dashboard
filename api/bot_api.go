@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -86,7 +87,12 @@ func handleBotApplicationForms(w http.ResponseWriter, r *http.Request, gid strin
 	store.mu.RUnlock()
 	out := make([]formOut, 0, len(forms))
 	for _, f := range forms {
-		out = append(out, formOut{ID: gid + ":" + f.RoleID, Role: f.RoleID, URL: f.URL, Title: f.RoleID})
+		out = append(out, formOut{
+			ID:    gid + ":" + strconv.FormatInt(f.ID, 10),
+			Role:  f.AcceptedRoleID,
+			URL:   "", // legacy field — Appy forms are answered in Discord, not via URL
+			Title: f.Name,
+		})
 	}
 	writeJSON(w, http.StatusOK, out)
 }

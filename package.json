@@ -4,8 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "cd api && go run ./cmd/dashctl dev",
+    "dev:web": "vite",
     "build": "vite build",
+    "start": "cd api && go run ./cmd/dashctl start",
+    "gen-pages": "cd api && go run ./cmd/dashctl gen-pages",
     "preview": "vite preview"
   },
   "devDependencies": {

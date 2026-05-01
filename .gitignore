@@ -1,7 +1,11 @@
 node_modules/
 .env
 .env.*
+# Allow committed templates and the safe-by-default development preset
 !.env.example
+!.env.development
+!.env.production.example
+
 dist/
 build/
 .claude/
@@ -9,4 +13,5 @@ build/
 # Go build artefacts
 api/che1-dashboard-api.exe
 api/che1-dashboard
+api/che1-dashboard.exe
 api/dist/

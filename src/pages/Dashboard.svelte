@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { sidebarLinks, routes, getRoute } from '../dashboard/data/pages.js';
-  import { user, guilds, currentGuild, currentGuildId, loadMe, loadGuilds, logout } from '../lib/stores.js';
+  import { user, guilds, currentGuild, currentGuildId, meta, loadMe, loadMeta, loadGuilds, logout } from '../lib/stores.js';
   import { avatarUrl, guildIconUrl } from '../lib/ui.js';
 
   const componentModules = import.meta.glob('../dashboard/components/*.svelte');
@@ -43,6 +43,7 @@
   }
 
   async function init() {
+    loadMeta();
     try { await loadMe(); } catch (e) {
       loading = false;
       location.hash = '#/login';
@@ -135,6 +136,11 @@
   <div class="main">
     <header class="topbar">
       <h2>{route.pageTitle}</h2>
+      {#if $meta?.dev_mode}
+        <span class="mode-badge dev" title="APP_ENV={$meta.app_env} • DEV_MODE={String($meta.dev_mode)}">DEV MODE</span>
+      {:else if $meta?.app_env === 'production'}
+        <span class="mode-badge prod" title="APP_ENV=production">PROD</span>
+      {/if}
       <div class="user" class:open={userMenuOpen}>
         <button on:click={() => userMenuOpen = !userMenuOpen}>
           <img src={avatarUrl($user)} alt="" />
@@ -201,6 +207,9 @@
   .main { flex:1; display:flex; flex-direction:column; min-width:0; }
   .topbar { display:flex; justify-content:space-between; align-items:center; padding:16px 32px; background:#fff; border-bottom:1px solid #e5e7eb; }
   .topbar h2 { margin:0; font-size:18px; color:#111827; }
+  .mode-badge { margin-left:auto; margin-right:14px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:0.5px; }
+  .mode-badge.dev { background:#fef3c7; color:#92400e; border:1px solid #fcd34d; }
+  .mode-badge.prod { background:#dcfce7; color:#166534; border:1px solid #86efac; }
   .user { position:relative; }
   .user > button { display:flex; align-items:center; gap:10px; background:transparent; border:none; cursor:pointer; color:#111827; font-size:14px; }
   .user img { width:36px; height:36px; border-radius:50%; }

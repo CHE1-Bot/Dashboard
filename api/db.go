@@ -250,8 +250,15 @@ func (d *DB) Migrate(ctx context.Context) error {
 			winner_count  INTEGER NOT NULL DEFAULT 1,
 			entrants      INTEGER NOT NULL DEFAULT 0,
 			hosted_by     TEXT,
-			required_role TEXT
+			required_role TEXT,
+			frequency     TEXT NOT NULL DEFAULT 'daily',
+			recurring     BOOLEAN NOT NULL DEFAULT FALSE,
+			next_run_at   TIMESTAMPTZ
 		)`,
+		// Best-effort migrations for older deployments
+		`ALTER TABLE dash_giveaway_meta ADD COLUMN IF NOT EXISTS frequency TEXT NOT NULL DEFAULT 'daily'`,
+		`ALTER TABLE dash_giveaway_meta ADD COLUMN IF NOT EXISTS recurring BOOLEAN NOT NULL DEFAULT FALSE`,
+		`ALTER TABLE dash_giveaway_meta ADD COLUMN IF NOT EXISTS next_run_at TIMESTAMPTZ`,
 
 		`CREATE TABLE IF NOT EXISTS dash_giveaway_blacklist (
 			id         BIGSERIAL PRIMARY KEY,
@@ -312,14 +319,110 @@ func (d *DB) Migrate(ctx context.Context) error {
 			application_id BIGINT PRIMARY KEY,
 			username       TEXT,
 			role_id        TEXT,
-			role_name      TEXT
+			role_name      TEXT,
+			form_id        BIGINT,
+			form_name      TEXT,
+			reviewed_by    TEXT,
+			reviewed_by_name TEXT,
+			reviewed_at    TIMESTAMPTZ,
+			review_note    TEXT,
+			avatar         TEXT
 		)`,
+		`ALTER TABLE dash_application_meta ADD COLUMN IF NOT EXISTS form_id BIGINT`,
+		`ALTER TABLE dash_application_meta ADD COLUMN IF NOT EXISTS form_name TEXT`,
+		`ALTER TABLE dash_application_meta ADD COLUMN IF NOT EXISTS reviewed_by TEXT`,
+		`ALTER TABLE dash_application_meta ADD COLUMN IF NOT EXISTS reviewed_by_name TEXT`,
+		`ALTER TABLE dash_application_meta ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ`,
+		`ALTER TABLE dash_application_meta ADD COLUMN IF NOT EXISTS review_note TEXT`,
+		`ALTER TABLE dash_application_meta ADD COLUMN IF NOT EXISTS avatar TEXT`,
+
+		// Appy-style rich form definitions.
+		`CREATE TABLE IF NOT EXISTS dash_application_forms (
+			id                    BIGSERIAL PRIMARY KEY,
+			guild_id              TEXT NOT NULL,
+			name                  TEXT NOT NULL,
+			description           TEXT,
+			emoji                 TEXT,
+			color                 TEXT NOT NULL DEFAULT '#5865f2',
+			questions             JSONB NOT NULL DEFAULT '[]'::JSONB,
+			submission_channel_id TEXT,
+			accepted_role_id      TEXT,
+			required_role_id      TEXT,
+			blocked_role_ids      JSONB NOT NULL DEFAULT '[]'::JSONB,
+			cooldown_hours        INTEGER NOT NULL DEFAULT 0,
+			account_age_days      INTEGER NOT NULL DEFAULT 0,
+			accept_dm_template    TEXT NOT NULL DEFAULT '',
+			reject_dm_template    TEXT NOT NULL DEFAULT '',
+			enabled               BOOLEAN NOT NULL DEFAULT TRUE,
+			created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_dash_application_forms_guild ON dash_application_forms(guild_id)`,
 
 		`CREATE TABLE IF NOT EXISTS dash_ticket_meta (
 			ticket_id   BIGINT PRIMARY KEY,
 			username    TEXT,
 			assigned_to TEXT,
-			tags        JSONB NOT NULL DEFAULT '[]'::JSONB
+			tags        JSONB NOT NULL DEFAULT '[]'::JSONB,
+			category_id BIGINT,
+			claimed_by  TEXT,
+			claimed_at  TIMESTAMPTZ,
+			last_message_at TIMESTAMPTZ,
+			autoclose_warned_at TIMESTAMPTZ
+		)`,
+		// Best-effort migrations for existing dash_ticket_meta tables; ALTER ... IF NOT EXISTS
+		// is supported by Postgres 9.6+.
+		`ALTER TABLE dash_ticket_meta ADD COLUMN IF NOT EXISTS category_id BIGINT`,
+		`ALTER TABLE dash_ticket_meta ADD COLUMN IF NOT EXISTS claimed_by TEXT`,
+		`ALTER TABLE dash_ticket_meta ADD COLUMN IF NOT EXISTS claimed_at TIMESTAMPTZ`,
+		`ALTER TABLE dash_ticket_meta ADD COLUMN IF NOT EXISTS last_message_at TIMESTAMPTZ`,
+		`ALTER TABLE dash_ticket_meta ADD COLUMN IF NOT EXISTS autoclose_warned_at TIMESTAMPTZ`,
+
+		// ---- TicketsBot v2-style additions ----
+		`CREATE TABLE IF NOT EXISTS dash_ticket_categories (
+			id                BIGSERIAL PRIMARY KEY,
+			guild_id          TEXT NOT NULL,
+			name              TEXT NOT NULL,
+			channel_id        TEXT,
+			support_role_ids  JSONB NOT NULL DEFAULT '[]'::JSONB,
+			mention_role_ids  JSONB NOT NULL DEFAULT '[]'::JSONB,
+			welcome_message   TEXT NOT NULL DEFAULT 'Thanks for opening a ticket. Support will be with you shortly.',
+			naming_pattern    TEXT NOT NULL DEFAULT 'ticket-{user}',
+			claim_required    BOOLEAN NOT NULL DEFAULT FALSE,
+			max_per_user      INTEGER NOT NULL DEFAULT 1,
+			form_id           BIGINT,
+			color             TEXT NOT NULL DEFAULT '#3498db',
+			emoji             TEXT,
+			disabled          BOOLEAN NOT NULL DEFAULT FALSE,
+			position          INTEGER NOT NULL DEFAULT 0,
+			created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_dash_ticket_categories_guild ON dash_ticket_categories(guild_id)`,
+
+		`CREATE TABLE IF NOT EXISTS dash_ticket_snippets (
+			id          BIGSERIAL PRIMARY KEY,
+			guild_id    TEXT NOT NULL,
+			name        TEXT NOT NULL,
+			content     TEXT NOT NULL,
+			created_by  TEXT,
+			updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS uq_dash_ticket_snippets_name ON dash_ticket_snippets(guild_id, name)`,
+
+		// Settings table extensions (idempotent)
+		`ALTER TABLE dash_ticket_settings ADD COLUMN IF NOT EXISTS claim_required BOOLEAN NOT NULL DEFAULT FALSE`,
+		`ALTER TABLE dash_ticket_settings ADD COLUMN IF NOT EXISTS autoclose_hours INTEGER NOT NULL DEFAULT 0`,
+		`ALTER TABLE dash_ticket_settings ADD COLUMN IF NOT EXISTS autoclose_warning_hours INTEGER NOT NULL DEFAULT 0`,
+		`ALTER TABLE dash_ticket_settings ADD COLUMN IF NOT EXISTS transcript_channel_id TEXT`,
+		`ALTER TABLE dash_ticket_settings ADD COLUMN IF NOT EXISTS ping_role_ids JSONB NOT NULL DEFAULT '[]'::JSONB`,
+		`ALTER TABLE dash_ticket_settings ADD COLUMN IF NOT EXISTS user_can_close BOOLEAN NOT NULL DEFAULT TRUE`,
+		`ALTER TABLE dash_ticket_settings ADD COLUMN IF NOT EXISTS use_threads BOOLEAN NOT NULL DEFAULT FALSE`,
+
+		// Stored HTML transcript per ticket (small enough; could move to S3 later)
+		`CREATE TABLE IF NOT EXISTS dash_ticket_transcripts (
+			ticket_id    BIGINT PRIMARY KEY,
+			html         TEXT NOT NULL,
+			generated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+			generated_by TEXT
 		)`,
 	}
 

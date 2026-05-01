@@ -29,10 +29,14 @@
     <div class="grid">
       {#each list as g}
         <div class="card">
-          <div class="prize">{g.prize}</div>
+          <div class="head">
+            <span class="prize">{g.prize}</span>
+            <span class={'freq ' + (g.frequency || 'daily')}>{g.frequency || 'daily'}</span>
+          </div>
           <div class="meta"><i class="fa-solid fa-clock"></i> ends {relativeTime(g.ends_at)}</div>
           <div class="meta"><i class="fa-solid fa-user-plus"></i> {g.entrants} entrants</div>
           <div class="meta"><i class="fa-solid fa-trophy"></i> {g.winner_count} winner(s)</div>
+          {#if g.recurring}<div class="meta recurring"><i class="fa-solid fa-arrows-rotate"></i> Recurring</div>{/if}
           <button class="btn" on:click={() => endNow(g)}>End now</button>
         </div>
       {/each}
@@ -43,8 +47,14 @@
 <style>
   .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:14px; }
   .card { border:1px solid #e5e7eb; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
   .prize { font-size:16px; font-weight:700; color:#111827; }
+  .freq { font-size:10px; font-weight:700; padding:3px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:0.5px; }
+  .freq.daily { background:#dcfce7; color:#166534; }
+  .freq.weekly { background:#dbeafe; color:#1e40af; }
+  .freq.monthly { background:#ede9fe; color:#5b21b6; }
   .meta { color:#475569; font-size:13px; }
+  .meta.recurring { color:#5b21b6; font-weight:600; }
   .btn { margin-top:10px; padding:8px 14px; background:#e2e8f0; color:#0f172a; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; align-self:flex-start; }
   .btn:hover { filter:brightness(0.95); }
   .empty { color:#94a3b8; }

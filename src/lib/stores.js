@@ -3,9 +3,21 @@ import { api } from './api.js';
 
 export const user = writable(null);            // current Discord user, or null
 export const guilds = writable([]);            // all guilds the user is in
+export const meta = writable(null);            // { app_env, dev_mode, oauth_enabled, ... }
 export const currentGuildId = writable(
   localStorage.getItem('che1.currentGuildId') || null
 );
+
+export async function loadMeta() {
+  try {
+    const m = await api.get('/meta');
+    meta.set(m);
+    return m;
+  } catch {
+    meta.set(null);
+    return null;
+  }
+}
 
 currentGuildId.subscribe((v) => {
   if (v) localStorage.setItem('che1.currentGuildId', v);

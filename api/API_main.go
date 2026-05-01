@@ -78,18 +78,24 @@ type GuildSettings struct {
 }
 
 type Ticket struct {
-	ID            int64  `json:"id"`
-	GuildID       string `json:"guild_id"`
-	ChannelID     string `json:"channel_id"`
-	UserID        string `json:"user_id"`
-	Username      string `json:"username"`
-	Subject       string `json:"subject"`
-	Status        string `json:"status"` // open | closed
-	TranscriptURL string `json:"transcript_url,omitempty"`
-	AssignedTo    string `json:"assigned_to,omitempty"`
-	Tags          []string `json:"tags"`
-	CreatedAt     string `json:"created_at"`
-	ClosedAt      string `json:"closed_at,omitempty"`
+	ID             int64    `json:"id"`
+	GuildID        string   `json:"guild_id"`
+	ChannelID      string   `json:"channel_id"`
+	UserID         string   `json:"user_id"`
+	Username       string   `json:"username"`
+	Subject        string   `json:"subject"`
+	Status         string   `json:"status"` // open | closed
+	TranscriptURL  string   `json:"transcript_url,omitempty"`
+	AssignedTo     string   `json:"assigned_to,omitempty"`
+	Tags           []string `json:"tags"`
+	CategoryID     int64    `json:"category_id,omitempty"`
+	CategoryName   string   `json:"category_name,omitempty"`
+	ClaimedBy      string   `json:"claimed_by,omitempty"`
+	ClaimedByName  string   `json:"claimed_by_name,omitempty"`
+	ClaimedAt      string   `json:"claimed_at,omitempty"`
+	LastMessageAt  string   `json:"last_message_at,omitempty"`
+	CreatedAt      string   `json:"created_at"`
+	ClosedAt       string   `json:"closed_at,omitempty"`
 }
 
 type TicketPanel struct {
@@ -103,10 +109,12 @@ type TicketPanel struct {
 }
 
 type TicketPanelButton struct {
-	Label    string `json:"label"`
-	Style    string `json:"style"`
-	FormID   int64  `json:"form_id,omitempty"`
-	Category string `json:"category"`
+	Label      string `json:"label"`
+	Style      string `json:"style"`
+	Emoji      string `json:"emoji,omitempty"`
+	FormID     int64  `json:"form_id,omitempty"`
+	CategoryID int64  `json:"category_id,omitempty"`
+	Category   string `json:"category,omitempty"` // legacy free-text label, still accepted
 }
 
 type TicketForm struct {
@@ -146,12 +154,49 @@ type TicketStaff struct {
 }
 
 type TicketSettings struct {
-	CategoryID      string   `json:"category_id"`
+	CategoryID            string   `json:"category_id"`
+	SupportRoleIDs        []string `json:"support_role_ids"`
+	TranscriptsOn         bool     `json:"transcripts_on"`
+	TranscriptChannelID   string   `json:"transcript_channel_id"`
+	CloseConfirm          bool     `json:"close_confirm"`
+	MaxOpenPerUser        int      `json:"max_open_per_user"`
+	NamingPattern         string   `json:"naming_pattern"`
+	ClaimRequired         bool     `json:"claim_required"`
+	AutocloseHours        int      `json:"autoclose_hours"`
+	AutocloseWarningHours int      `json:"autoclose_warning_hours"`
+	PingRoleIDs           []string `json:"ping_role_ids"`
+	UserCanClose          bool     `json:"user_can_close"`
+	UseThreads            bool     `json:"use_threads"`
+}
+
+// TicketCategory mirrors TicketsBot v2's per-button category. Each panel
+// button binds to exactly one category which controls where the channel is
+// created, who's pinged, the welcome message, and whether claim is required.
+type TicketCategory struct {
+	ID              int64    `json:"id"`
+	GuildID         string   `json:"guild_id"`
+	Name            string   `json:"name"`
+	ChannelID       string   `json:"channel_id"` // parent category channel id (Discord)
 	SupportRoleIDs  []string `json:"support_role_ids"`
-	TranscriptsOn   bool     `json:"transcripts_on"`
-	CloseConfirm    bool     `json:"close_confirm"`
-	MaxOpenPerUser  int      `json:"max_open_per_user"`
+	MentionRoleIDs  []string `json:"mention_role_ids"`
+	WelcomeMessage  string   `json:"welcome_message"`
 	NamingPattern   string   `json:"naming_pattern"`
+	ClaimRequired   bool     `json:"claim_required"`
+	MaxPerUser      int      `json:"max_per_user"`
+	FormID          int64    `json:"form_id,omitempty"`
+	Color           string   `json:"color"`
+	Emoji           string   `json:"emoji"`
+	Disabled        bool     `json:"disabled"`
+	Position        int      `json:"position"`
+}
+
+type TicketSnippet struct {
+	ID        int64  `json:"id"`
+	GuildID   string `json:"guild_id"`
+	Name      string `json:"name"`
+	Content   string `json:"content"`
+	CreatedBy string `json:"created_by,omitempty"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 type UserLevel struct {
@@ -220,36 +265,96 @@ type Report struct {
 }
 
 type Application struct {
-	ID        int64           `json:"id"`
-	GuildID   string          `json:"guild_id"`
-	UserID    string          `json:"user_id"`
-	Username  string          `json:"username"`
-	RoleID    string          `json:"role_id"`
-	RoleName  string          `json:"role_name"`
-	Answers   map[string]any  `json:"answers"`
-	Status    string          `json:"status"` // pending | accepted | rejected
-	CreatedAt string          `json:"created_at"`
+	ID            int64          `json:"id"`
+	GuildID       string         `json:"guild_id"`
+	FormID        int64          `json:"form_id"`
+	FormName      string         `json:"form_name,omitempty"`
+	UserID        string         `json:"user_id"`
+	Username      string         `json:"username"`
+	Avatar        string         `json:"avatar,omitempty"`
+	RoleID        string         `json:"role_id,omitempty"`
+	RoleName      string         `json:"role_name,omitempty"`
+	Answers       map[string]any `json:"answers"`
+	Status        string         `json:"status"` // pending | accepted | rejected
+	ReviewedBy    string         `json:"reviewed_by,omitempty"`
+	ReviewedByName string        `json:"reviewed_by_name,omitempty"`
+	ReviewedAt    string         `json:"reviewed_at,omitempty"`
+	ReviewNote    string         `json:"review_note,omitempty"`
+	CreatedAt     string         `json:"created_at"`
 }
 
+// ApplicationQuestion — one field on a form. Mirrors Appy's flow.
+type ApplicationQuestion struct {
+	ID          string   `json:"id"`            // stable identifier used as key in Answers
+	Label       string   `json:"label"`
+	Type        string   `json:"type"`          // short | paragraph | choice | scale
+	Required    bool     `json:"required"`
+	Placeholder string   `json:"placeholder,omitempty"`
+	Choices     []string `json:"choices,omitempty"` // for type=choice
+	Min         int      `json:"min,omitempty"`     // for type=scale
+	Max         int      `json:"max,omitempty"`     // for type=scale
+}
+
+// ApplicationForm — a full Appy-style form with gating, review channel, and
+// accept/reject DM templates. Replaces the old single-URL form.
 type ApplicationForm struct {
-	GuildID  string `json:"guild_id"`
-	RoleID   string `json:"role_id"`
-	URL      string `json:"url"`
+	ID                 int64                 `json:"id"`
+	GuildID            string                `json:"guild_id"`
+	Name               string                `json:"name"`
+	Description        string                `json:"description"`
+	Emoji              string                `json:"emoji,omitempty"`
+	Color              string                `json:"color"`
+	Questions          []ApplicationQuestion `json:"questions"`
+	SubmissionChannelID string               `json:"submission_channel_id"`
+	AcceptedRoleID    string                 `json:"accepted_role_id,omitempty"`
+	RequiredRoleID    string                 `json:"required_role_id,omitempty"`
+	BlockedRoleIDs    []string               `json:"blocked_role_ids,omitempty"`
+	CooldownHours     int                    `json:"cooldown_hours"`
+	AccountAgeDays    int                    `json:"account_age_days"` // minimum Discord account age
+	AcceptDMTemplate  string                 `json:"accept_dm_template"`
+	RejectDMTemplate  string                 `json:"reject_dm_template"`
+	Enabled           bool                   `json:"enabled"`
+	CreatedAt         string                 `json:"created_at"`
 }
 
 type Giveaway struct {
-	ID        int64    `json:"id"`
-	GuildID   string   `json:"guild_id"`
-	ChannelID string   `json:"channel_id"`
-	MessageID string   `json:"message_id"`
-	Prize     string   `json:"prize"`
-	Winners   []string `json:"winners"`
-	WinnerCount int    `json:"winner_count"`
-	EndsAt    string   `json:"ends_at"`
-	Status    string   `json:"status"` // running | ended
-	Entrants  int      `json:"entrants"`
-	HostedBy  string   `json:"hosted_by"`
-	CreatedAt string   `json:"created_at"`
+	ID             int64    `json:"id"`
+	GuildID        string   `json:"guild_id"`
+	ChannelID      string   `json:"channel_id"`
+	MessageID      string   `json:"message_id"`
+	Prize          string   `json:"prize"`
+	Winners        []string `json:"winners"`
+	WinnerCount    int      `json:"winner_count"`
+	EndsAt         string   `json:"ends_at"`
+	Status         string   `json:"status"`         // running | ended
+	Entrants       int      `json:"entrants"`
+	HostedBy       string   `json:"hosted_by"`
+	CreatedAt      string   `json:"created_at"`
+	Frequency      string   `json:"frequency"`       // daily | weekly | monthly
+	Recurring      bool     `json:"recurring"`       // auto-restart when ended
+	RequiredRoleID string   `json:"required_role_id,omitempty"`
+	NextRunAt      string   `json:"next_run_at,omitempty"`
+}
+
+// giveawayTier defines the duration a frequency tier covers and whether it's
+// gated behind premium.
+type giveawayTier struct {
+	Hours       int
+	PremiumOnly bool
+	Label       string
+}
+
+var giveawayTiers = map[string]giveawayTier{
+	"daily":   {Hours: 24, PremiumOnly: false, Label: "Daily"},
+	"weekly":  {Hours: 24 * 7, PremiumOnly: true, Label: "Weekly"},
+	"monthly": {Hours: 24 * 30, PremiumOnly: true, Label: "Monthly"},
+}
+
+func isGuildPremium(gid string) bool {
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+	s := store.settings[gid]
+	return s != nil && s.Premium
 }
 
 type BlacklistEntry struct {
@@ -344,6 +449,8 @@ type Store struct {
 	embeds      map[string]*TicketEmbed
 	staff       map[string][]TicketStaff
 	ticketSet   map[string]*TicketSettings
+	categories  map[string][]TicketCategory
+	snippets    map[string][]TicketSnippet
 
 	userLevels  map[string][]UserLevel
 	levelingSet map[string]*LevelingSettings
@@ -380,14 +487,16 @@ func newStore() *Store {
 		channels:   map[string][]Channel{},
 		members:    map[string][]Member{},
 
-		settings:  map[string]*GuildSettings{},
-		tickets:   map[string][]Ticket{},
-		panels:    map[string][]TicketPanel{},
-		forms:     map[string][]TicketForm{},
-		tags:      map[string][]TicketTag{},
-		embeds:    map[string]*TicketEmbed{},
-		staff:     map[string][]TicketStaff{},
-		ticketSet: map[string]*TicketSettings{},
+		settings:   map[string]*GuildSettings{},
+		tickets:    map[string][]Ticket{},
+		panels:     map[string][]TicketPanel{},
+		forms:      map[string][]TicketForm{},
+		tags:       map[string][]TicketTag{},
+		embeds:     map[string]*TicketEmbed{},
+		staff:      map[string][]TicketStaff{},
+		ticketSet:  map[string]*TicketSettings{},
+		categories: map[string][]TicketCategory{},
+		snippets:   map[string][]TicketSnippet{},
 
 		userLevels:  map[string][]UserLevel{},
 		levelingSet: map[string]*LevelingSettings{},
@@ -470,11 +579,46 @@ func (s *Store) seedGuild(gid string) {
 			"tickets": true, "moderation": true, "giveaways": true, "leveling": true, "applications": true,
 		},
 		FeatureFlags: map[string]string{},
-		Premium:      false,
+		// Mark the second demo guild as premium so the UI can show both states.
+		Premium: gid == "200000000000000002",
 	}
 	s.ticketSet[gid] = &TicketSettings{
-		CategoryID: gid + "-c4", SupportRoleIDs: []string{gid + "-r3"},
-		TranscriptsOn: true, CloseConfirm: true, MaxOpenPerUser: 1, NamingPattern: "ticket-{user}",
+		CategoryID:            gid + "-c4",
+		SupportRoleIDs:        []string{gid + "-r3"},
+		TranscriptsOn:         true,
+		TranscriptChannelID:   gid + "-c3",
+		CloseConfirm:          true,
+		MaxOpenPerUser:        1,
+		NamingPattern:         "ticket-{user}",
+		ClaimRequired:         false,
+		AutocloseHours:        72,
+		AutocloseWarningHours: 60,
+		PingRoleIDs:           []string{gid + "-r3"},
+		UserCanClose:          true,
+		UseThreads:            false,
+	}
+	s.categories[gid] = []TicketCategory{
+		{
+			ID: s.nextID(), GuildID: gid, Name: "General Support",
+			ChannelID: gid + "-c4", SupportRoleIDs: []string{gid + "-r3"},
+			MentionRoleIDs: []string{gid + "-r3"},
+			WelcomeMessage: "Thanks for opening a ticket. Support will be with you shortly.",
+			NamingPattern:  "ticket-{user}", ClaimRequired: false, MaxPerUser: 1,
+			Color: "#5865f2", Emoji: "🎫", Position: 0,
+		},
+		{
+			ID: s.nextID(), GuildID: gid, Name: "Billing",
+			ChannelID: gid + "-c4", SupportRoleIDs: []string{gid + "-r4"},
+			MentionRoleIDs: []string{gid + "-r4"},
+			WelcomeMessage: "A team member will review your billing question shortly.",
+			NamingPattern:  "billing-{user}", ClaimRequired: true, MaxPerUser: 1,
+			Color: "#10b981", Emoji: "💳", Position: 1,
+		},
+	}
+	s.snippets[gid] = []TicketSnippet{
+		{ID: s.nextID(), GuildID: gid, Name: "welcome", Content: "Hi {user}! How can we help today?", UpdatedAt: isoDaysAgo(2)},
+		{ID: s.nextID(), GuildID: gid, Name: "close", Content: "Thanks — closing this ticket. Reach out anytime!", UpdatedAt: isoDaysAgo(1)},
+		{ID: s.nextID(), GuildID: gid, Name: "wait", Content: "We'll get back to you within 24 hours.", UpdatedAt: isoDaysAgo(1)},
 	}
 	s.embeds[gid] = &TicketEmbed{
 		GuildID: gid, Title: "Support", Description: "Click a button below to open a ticket.",
@@ -489,7 +633,14 @@ func (s *Store) seedGuild(gid string) {
 		{UserID: "u1", Username: "alice", Roles: []string{gid + "-r3"}},
 	}
 
-	// tickets
+	// tickets — seeded with category bindings, claims and last-message timestamps
+	cat0, cat1 := int64(0), int64(0)
+	if cs := s.categories[gid]; len(cs) > 0 {
+		cat0 = cs[0].ID
+		if len(cs) > 1 {
+			cat1 = cs[1].ID
+		}
+	}
 	for i := 1; i <= 4; i++ {
 		id := s.nextID()
 		status := "open"
@@ -498,13 +649,28 @@ func (s *Store) seedGuild(gid string) {
 			status = "closed"
 			closed = isoDaysAgo(i)
 		}
-		s.tickets[gid] = append(s.tickets[gid], Ticket{
+		t := Ticket{
 			ID: id, GuildID: gid, ChannelID: gid + "-c4-" + strconv.Itoa(i),
 			UserID: "u" + strconv.Itoa(i), Username: []string{"alice", "bob", "carol", "dave"}[i-1],
 			Subject: []string{"Account issue", "Billing question", "Bug report", "Feature request"}[i-1],
 			Status:  status, Tags: []string{},
-			CreatedAt: isoDaysAgo(i + 1), ClosedAt: closed,
-		})
+			CreatedAt:     isoDaysAgo(i + 1),
+			ClosedAt:      closed,
+			LastMessageAt: time.Now().Add(-time.Duration(i) * time.Hour).UTC().Format(time.RFC3339),
+		}
+		if i%2 == 0 {
+			t.CategoryID = cat1
+			t.CategoryName = "Billing"
+		} else {
+			t.CategoryID = cat0
+			t.CategoryName = "General Support"
+		}
+		if i == 1 {
+			t.ClaimedBy = "u1"
+			t.ClaimedByName = "alice"
+			t.ClaimedAt = isoDaysAgo(0)
+		}
+		s.tickets[gid] = append(s.tickets[gid], t)
 	}
 	s.panels[gid] = []TicketPanel{{
 		ID: s.nextID(), GuildID: gid, ChannelID: gid + "-c1",
@@ -556,23 +722,72 @@ func (s *Store) seedGuild(gid string) {
 		{ID: s.nextID(), GuildID: gid, ReporterID: "u2", ReporterName: "bob", TargetID: "u3", TargetName: "carol", Reason: "spam", Status: "open", CreatedAt: isoDaysAgo(1)},
 	}
 
-	// applications
-	s.appForms[gid] = []ApplicationForm{
-		{GuildID: gid, RoleID: gid + "-r3", URL: "https://forms.example/mod"},
+	// applications — Appy-style form with custom questions
+	modForm := ApplicationForm{
+		ID: s.nextID(), GuildID: gid,
+		Name:        "Moderator Application",
+		Description: "Apply to join the moderation team. Average review time is 48 hours.",
+		Emoji:       "🛡️",
+		Color:       "#5865f2",
+		Questions: []ApplicationQuestion{
+			{ID: "age", Label: "How old are you?", Type: "short", Required: true, Placeholder: "e.g. 18"},
+			{ID: "timezone", Label: "What is your timezone?", Type: "short", Required: true, Placeholder: "e.g. UTC+2"},
+			{ID: "experience", Label: "Tell us about your moderation experience.", Type: "paragraph", Required: true,
+				Placeholder: "Servers you've moderated, tools you've used, …"},
+			{ID: "availability", Label: "How many hours per week can you commit?", Type: "choice", Required: true,
+				Choices: []string{"<5 hours", "5–10 hours", "10–20 hours", "20+ hours"}},
+			{ID: "fit", Label: "How well do you know our community?", Type: "scale", Required: true, Min: 1, Max: 5},
+		},
+		SubmissionChannelID: gid + "-c3",
+		AcceptedRoleID:      gid + "-r3",
+		RequiredRoleID:      "",
+		CooldownHours:       168,
+		AccountAgeDays:      30,
+		AcceptDMTemplate:    "Congrats {user}! Your application for **{form}** in **{guild}** has been accepted. Welcome to the team!",
+		RejectDMTemplate:    "Thanks for applying to **{form}** in **{guild}**, {user}. Unfortunately we can't accept your application this time. Reason: {reason}",
+		Enabled:             true,
+		CreatedAt:           isoDaysAgo(14),
 	}
+	s.appForms[gid] = []ApplicationForm{modForm}
 	s.apps[gid] = []Application{
-		{ID: s.nextID(), GuildID: gid, UserID: "u4", Username: "dave", RoleID: gid + "-r3", RoleName: "Moderator",
-			Answers: map[string]any{"why": "I love helping"}, Status: "pending", CreatedAt: isoDaysAgo(2)},
+		{ID: s.nextID(), GuildID: gid, FormID: modForm.ID, FormName: modForm.Name,
+			UserID: "u4", Username: "dave",
+			RoleID: gid + "-r3", RoleName: "Moderator",
+			Answers: map[string]any{
+				"age":          "21",
+				"timezone":     "UTC+1",
+				"experience":   "I've moderated two communities of 5k+ members for the past 2 years.",
+				"availability": "10–20 hours",
+				"fit":          4,
+			},
+			Status: "pending", CreatedAt: isoDaysAgo(1)},
+		{ID: s.nextID(), GuildID: gid, FormID: modForm.ID, FormName: modForm.Name,
+			UserID: "u2", Username: "bob",
+			RoleID: gid + "-r3", RoleName: "Moderator",
+			Answers: map[string]any{
+				"age":          "17",
+				"timezone":     "UTC-5",
+				"experience":   "First time applying.",
+				"availability": "<5 hours",
+				"fit":          2,
+			},
+			Status: "pending", CreatedAt: isoDaysAgo(0)},
 	}
 
-	// giveaways
+	// giveaways — seed one of each tier so the UI shows the badges right away
 	s.giveaways[gid] = []Giveaway{
 		{ID: s.nextID(), GuildID: gid, ChannelID: gid + "-c5", MessageID: "msg1",
-			Prize: "Nitro Classic (1 month)", WinnerCount: 1, EndsAt: isoDaysFromNow(2), Status: "running",
-			Entrants: 37, HostedBy: "alice", CreatedAt: isoDaysAgo(1)},
+			Prize: "Nitro Classic (1 month)", WinnerCount: 1, EndsAt: isoDaysFromNow(1), Status: "running",
+			Entrants: 37, HostedBy: "alice", CreatedAt: isoDaysAgo(0),
+			Frequency: "daily", Recurring: true},
 		{ID: s.nextID(), GuildID: gid, ChannelID: gid + "-c5", MessageID: "msg2",
 			Prize: "$10 Steam Gift Card", WinnerCount: 1, EndsAt: isoDaysAgo(2), Status: "ended",
-			Winners: []string{"bob"}, Entrants: 112, HostedBy: "carol", CreatedAt: isoDaysAgo(5)},
+			Winners: []string{"bob"}, Entrants: 112, HostedBy: "carol", CreatedAt: isoDaysAgo(5),
+			Frequency: "weekly"},
+		{ID: s.nextID(), GuildID: gid, ChannelID: gid + "-c5", MessageID: "msg3",
+			Prize: "Mechanical keyboard", WinnerCount: 1, EndsAt: isoDaysFromNow(20), Status: "running",
+			Entrants: 481, HostedBy: "alice", CreatedAt: isoDaysAgo(10),
+			Frequency: "monthly", Recurring: false},
 	}
 	s.blacklist[gid] = []BlacklistEntry{}
 
@@ -603,6 +818,7 @@ var (
 	store           = newStore()
 	db              *DB
 	logger          = slog.New(slog.NewTextHandler(os.Stderr, nil))
+	appEnv          string
 	devMode         bool
 	clientID        string
 	clientSec       string
@@ -617,8 +833,17 @@ var (
 )
 
 func loadEnv() {
+	// APP_ENV picks which preset to load. Default is "development" so a fresh
+	// clone runs without configuration. In production, set APP_ENV=production
+	// (the start script does this for you).
+	appEnv = strings.ToLower(getenv("APP_ENV", "development"))
+	// Per-mode preset, then a generic .env override (gitignored secrets), then
+	// process env wins over both via Overload semantics: godotenv.Load does
+	// NOT override existing env, so the order here means "process env > .env >
+	// .env.<mode>".
+	_ = godotenv.Load(".env." + appEnv)
 	_ = godotenv.Load()
-	devMode = envBool("DEV_MODE", false)
+	devMode = envBool("DEV_MODE", appEnv == "development")
 	clientID = os.Getenv("DISCORD_CLIENT_ID")
 	clientSec = os.Getenv("DISCORD_CLIENT_SECRET")
 	redirectURI = getenv("DISCORD_REDIRECT_URI", "http://localhost:8080/api/auth/callback")
@@ -690,6 +915,18 @@ func main() {
 		_, _ = w.Write([]byte("ready"))
 	})
 
+	// Public meta — used by the SPA to render mode badge / OAuth-available hints.
+	mux.HandleFunc("/api/meta", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]any{
+			"app_env":         appEnv,
+			"dev_mode":        devMode,
+			"oauth_enabled":   clientID != "",
+			"worker_enabled":  workerURL != "",
+			"db_enabled":      db != nil,
+			"server_time":     time.Now().UTC().Format(time.RFC3339),
+		})
+	})
+
 	// Auth
 	mux.HandleFunc("/api/auth/login", handleLogin)
 	mux.HandleFunc("/api/auth/callback", handleCallback)
@@ -729,7 +966,9 @@ func main() {
 		cancel()
 	}()
 
-	logger.Info("CHE1 dashboard API listening", "addr", addr, "dev_mode", devMode, "db", db != nil, "worker", workerURL != "")
+	logger.Info("CHE1 dashboard API listening",
+		"addr", addr, "app_env", appEnv, "dev_mode", devMode,
+		"db", db != nil, "worker", workerURL != "")
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
@@ -1474,6 +1713,15 @@ func handleTickets(w http.ResponseWriter, r *http.Request, gid string, rem []str
 		}
 		writeJSON(w, http.StatusOK, out)
 		return
+	case "categories":
+		handleTicketCategories(w, r, gid, rem[1:])
+		return
+	case "snippets":
+		handleTicketSnippets(w, r, gid, rem[1:])
+		return
+	case "stats":
+		handleTicketStats(w, r, gid)
+		return
 	default:
 		// ticket by id
 		id, err := strconv.ParseInt(rem[0], 10, 64)
@@ -1482,9 +1730,15 @@ func handleTickets(w http.ResponseWriter, r *http.Request, gid string, rem []str
 			return
 		}
 		if len(rem) == 2 && rem[1] == "transcript" && r.Method == "GET" {
-			writeJSON(w, http.StatusOK, map[string]any{
-				"id": id, "content": "Transcript for ticket " + rem[0] + "\n\n(server-generated)",
-			})
+			handleTicketTranscript(w, r, gid, id)
+			return
+		}
+		if len(rem) == 2 && rem[1] == "claim" && r.Method == "POST" {
+			handleTicketClaim(w, r, gid, id)
+			return
+		}
+		if len(rem) == 2 && rem[1] == "unclaim" && r.Method == "POST" {
+			handleTicketUnclaim(w, r, gid, id)
 			return
 		}
 		if r.Method == "PATCH" {
@@ -1553,6 +1807,55 @@ func handleTicketPanels(w http.ResponseWriter, r *http.Request, gid string, rem 
 		p.GuildID = gid
 		store.panels[gid] = append(store.panels[gid], p)
 		writeJSON(w, http.StatusOK, p)
+		return
+	}
+	if r.Method == "PATCH" && len(rem) == 1 {
+		id, err := strconv.ParseInt(rem[0], 10, 64)
+		if err != nil {
+			writeErr(w, http.StatusBadRequest, "bad id")
+			return
+		}
+		var patch TicketPanel
+		if err := readJSON(r, &patch); err != nil {
+			writeErr(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		store.mu.Lock()
+		defer store.mu.Unlock()
+		for i, p := range store.panels[gid] {
+			if p.ID == id {
+				patch.ID = p.ID
+				patch.GuildID = gid
+				store.panels[gid][i] = patch
+				writeJSON(w, http.StatusOK, store.panels[gid][i])
+				return
+			}
+		}
+		writeErr(w, http.StatusNotFound, "panel not found")
+		return
+	}
+	if r.Method == "POST" && len(rem) == 2 && rem[1] == "deploy" {
+		id, err := strconv.ParseInt(rem[0], 10, 64)
+		if err != nil {
+			writeErr(w, http.StatusBadRequest, "bad id")
+			return
+		}
+		store.mu.RLock()
+		var p *TicketPanel
+		for i := range store.panels[gid] {
+			if store.panels[gid][i].ID == id {
+				p = &store.panels[gid][i]
+				break
+			}
+		}
+		store.mu.RUnlock()
+		if p == nil {
+			writeErr(w, http.StatusNotFound, "panel not found")
+			return
+		}
+		recordHistory(gid, "tickets.panel.deploy", p.Title)
+		forwardWorker(KindSendTicketPanel, gid, p)
+		writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 		return
 	}
 	if r.Method == "DELETE" && len(rem) == 1 {
@@ -1825,6 +2128,24 @@ func handleGiveaways(w http.ResponseWriter, r *http.Request, gid string, rem []s
 				writeErr(w, http.StatusBadRequest, err.Error())
 				return
 			}
+			// Default frequency for older clients that don't send one.
+			if g.Frequency == "" {
+				g.Frequency = "daily"
+			}
+			tier, ok := giveawayTiers[g.Frequency]
+			if !ok {
+				writeErr(w, http.StatusBadRequest, "invalid frequency: must be daily, weekly, or monthly")
+				return
+			}
+			// Premium gate
+			if tier.PremiumOnly && !isGuildPremium(gid) {
+				writeErr(w, http.StatusPaymentRequired, tier.Label+" giveaways require Premium")
+				return
+			}
+			// If ends_at not provided, derive from frequency tier
+			if g.EndsAt == "" {
+				g.EndsAt = time.Now().Add(time.Duration(tier.Hours) * time.Hour).UTC().Format(time.RFC3339)
+			}
 			store.mu.Lock()
 			defer store.mu.Unlock()
 			g.ID = store.nextID()
@@ -1834,9 +2155,12 @@ func handleGiveaways(w http.ResponseWriter, r *http.Request, gid string, rem []s
 			if g.WinnerCount <= 0 {
 				g.WinnerCount = 1
 			}
+			if g.Recurring {
+				g.NextRunAt = time.Now().Add(time.Duration(tier.Hours) * time.Hour).UTC().Format(time.RFC3339)
+			}
 			store.giveaways[gid] = append([]Giveaway{g}, store.giveaways[gid]...)
-			recordHistory(gid, "giveaways.create", g.Prize)
-			forwardWorker("giveaways.create", gid, g)
+			recordHistory(gid, "giveaways.create", tier.Label+" — "+g.Prize)
+			forwardWorker(KindSendGiveawayPanel, gid, g)
 			writeJSON(w, http.StatusOK, g)
 			return
 		}
@@ -1858,11 +2182,48 @@ func handleGiveaways(w http.ResponseWriter, r *http.Request, gid string, rem []s
 		return
 	case "premium":
 		store.mu.RLock()
-		defer store.mu.RUnlock()
+		premium := store.settings[gid] != nil && store.settings[gid].Premium
+		store.mu.RUnlock()
+		type tierOut struct {
+			Key          string `json:"key"`
+			Label        string `json:"label"`
+			Hours        int    `json:"hours"`
+			PremiumOnly  bool   `json:"premium_only"`
+			Available    bool   `json:"available"`
+			Description  string `json:"description"`
+		}
+		descs := map[string]string{
+			"daily":   "Run a fresh giveaway every 24 hours. Available on every server.",
+			"weekly":  "Roll a winner once a week — perfect for community Q&A or shop drops.",
+			"monthly": "Big-prize monthly raffles with role-weighted entries.",
+		}
+		tiers := []tierOut{}
+		for _, k := range []string{"daily", "weekly", "monthly"} {
+			t := giveawayTiers[k]
+			tiers = append(tiers, tierOut{
+				Key: k, Label: t.Label, Hours: t.Hours,
+				PremiumOnly: t.PremiumOnly,
+				Available:   !t.PremiumOnly || premium,
+				Description: descs[k],
+			})
+		}
 		writeJSON(w, http.StatusOK, map[string]any{
-			"premium":      store.settings[gid] != nil && store.settings[gid].Premium,
-			"benefits":     []string{"Unlimited active giveaways", "Bonus-entry roles", "Custom embeds", "Role-weighted winners"},
-			"upgrade_url":  "/#/premium",
+			"premium":     premium,
+			"tiers":       tiers,
+			"benefits":    []string{
+				"Weekly & monthly giveaway frequencies",
+				"Unlimited active giveaways",
+				"Bonus-entry roles & role-weighted winners",
+				"Custom embeds and recurring schedules",
+				"Priority support",
+			},
+			"free_includes": []string{
+				"Daily giveaways",
+				"Up to 3 active giveaways at once",
+				"Required-role entry gating",
+				"Manual end / reroll",
+			},
+			"upgrade_url": "/#/premium",
 		})
 		return
 	default:
@@ -1881,7 +2242,33 @@ func handleGiveaways(w http.ResponseWriter, r *http.Request, gid string, rem []s
 						store.giveaways[gid][i].Winners = []string{"bob"}
 					}
 					forwardWorker("giveaways.end", gid, store.giveaways[gid][i])
-					writeJSON(w, http.StatusOK, store.giveaways[gid][i])
+					ended := store.giveaways[gid][i]
+
+					// Recurring auto-restart: if the giveaway was scheduled to
+					// repeat AND its tier is still available (premium check),
+					// spawn a fresh one with the same prize/channel/winners.
+					if ended.Recurring {
+						if tier, ok := giveawayTiers[ended.Frequency]; ok {
+							premium := store.settings[gid] != nil && store.settings[gid].Premium
+							if !tier.PremiumOnly || premium {
+								next := Giveaway{
+									ChannelID: ended.ChannelID, Prize: ended.Prize,
+									WinnerCount: ended.WinnerCount, HostedBy: ended.HostedBy,
+									Frequency: ended.Frequency, Recurring: true,
+									RequiredRoleID: ended.RequiredRoleID,
+									Status: "running",
+									EndsAt:    time.Now().Add(time.Duration(tier.Hours) * time.Hour).UTC().Format(time.RFC3339),
+									NextRunAt: time.Now().Add(2 * time.Duration(tier.Hours) * time.Hour).UTC().Format(time.RFC3339),
+									CreatedAt: time.Now().UTC().Format(time.RFC3339),
+								}
+								next.ID = store.nextID()
+								next.GuildID = gid
+								store.giveaways[gid] = append([]Giveaway{next}, store.giveaways[gid]...)
+								forwardWorker(KindSendGiveawayPanel, gid, next)
+							}
+						}
+					}
+					writeJSON(w, http.StatusOK, ended)
 					return
 				}
 			}
@@ -2059,64 +2446,7 @@ func handleRewards(w http.ResponseWriter, r *http.Request, gid string, rem []str
 
 // ---------------- Applications ----------------
 
-func handleApplications(w http.ResponseWriter, r *http.Request, gid string, rem []string) {
-	if len(rem) == 0 {
-		if r.Method == "GET" {
-			store.mu.RLock()
-			defer store.mu.RUnlock()
-			writeJSON(w, http.StatusOK, store.apps[gid])
-			return
-		}
-	}
-	switch rem[0] {
-	case "forms":
-		if r.Method == "GET" {
-			store.mu.RLock()
-			defer store.mu.RUnlock()
-			writeJSON(w, http.StatusOK, store.appForms[gid])
-			return
-		}
-		if r.Method == "POST" {
-			var f ApplicationForm
-			if err := readJSON(r, &f); err != nil {
-				writeErr(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			f.GuildID = gid
-			store.mu.Lock()
-			defer store.mu.Unlock()
-			store.appForms[gid] = append(store.appForms[gid], f)
-			writeJSON(w, http.StatusOK, f)
-			return
-		}
-	default:
-		id, err := strconv.ParseInt(rem[0], 10, 64)
-		if err != nil {
-			writeErr(w, http.StatusBadRequest, "bad id")
-			return
-		}
-		if r.Method == "PATCH" {
-			var patch Application
-			if err := readJSON(r, &patch); err != nil {
-				writeErr(w, http.StatusBadRequest, err.Error())
-				return
-			}
-			store.mu.Lock()
-			defer store.mu.Unlock()
-			for i, a := range store.apps[gid] {
-				if a.ID == id {
-					if patch.Status != "" {
-						store.apps[gid][i].Status = patch.Status
-					}
-					writeJSON(w, http.StatusOK, store.apps[gid][i])
-					return
-				}
-			}
-			writeErr(w, http.StatusNotFound, "")
-			return
-		}
-	}
-	writeErr(w, http.StatusMethodNotAllowed, "")
-}
+// handleApplications dispatches the Appy-style application module routes.
+// Implementation lives in applications.go.
 
 // forwardWorker implementation lives in worker.go.

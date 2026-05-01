@@ -1,4 +1,59 @@
-# CHE1 Dashboard — Production Deployment
+# CHE1 Dashboard — Development & Production
+
+## Switching modes
+
+The whole stack runs in one of two modes, picked by `APP_ENV`:
+
+| Mode          | When to use                                  | Loads             |
+|---------------|----------------------------------------------|-------------------|
+| `development` | Local work. Default for `npm run dev`.       | `api/.env.development` then `api/.env` |
+| `production`  | Real deploy. Default for `npm start`.        | `api/.env.production` then `api/.env`  |
+
+In `development`, `DEV_MODE=true` is the default and — when `DISCORD_CLIENT_ID`
+is unset — `/api/auth/login` bypasses Discord and signs you in as a seeded demo
+user. The dashboard shows a yellow **DEV MODE** badge in the top bar.
+
+In `production`, `DEV_MODE=false`, real OAuth is required, and the badge turns
+green (or hides if you don't want it).
+
+### npm scripts
+
+```bash
+npm run dev        # Vite (5173) + Go API (8080), APP_ENV=development
+npm run dev:web    # Vite only (use if you run `go run ./api` yourself)
+npm run build      # vite build → dist/
+npm start          # build SPA, embed it, build Go binary, run with APP_ENV=production
+npm run gen-pages  # regenerate src/dashboard/data/pages.js from Go route defs
+```
+
+These npm scripts are thin shims around `dashctl`, a Go CLI that lives in
+[api/cmd/dashctl/](api/cmd/dashctl/). It replaces what used to be Node-authored
+launcher scripts. You can invoke it directly too:
+
+```bash
+cd api && go run ./cmd/dashctl dev
+cd api && go run ./cmd/dashctl start
+cd api && go run ./cmd/dashctl gen-pages
+```
+
+`dashctl` walks up from the cwd to find `package.json`, then runs all commands
+relative to that project root.
+
+### Per-mode env files
+
+- [api/.env.development](api/.env.development) — committed, safe defaults.
+  Edit when you want to point local dev at a real DB / Worker / OAuth app.
+- `api/.env.production` — gitignored. Copy
+  [api/.env.production.example](api/.env.production.example) to
+  `api/.env.production` and fill in real secrets.
+- `api/.env` is still loaded last as a generic override.
+
+The frontend learns its mode from `GET /api/meta`
+(`{ app_env, dev_mode, oauth_enabled, ... }`).
+
+---
+
+## Production deployment
 
 This repo ships a single-binary Svelte + Go dashboard that is designed to run
 alongside [`CHE1-Bot/Bot`](https://github.com/CHE1-Bot/Bot) and

@@ -96,7 +96,9 @@ func summarizePayload(p any) string {
 }
 
 // recordHistoryAsync enqueues a dash_history row without holding any lock on
-// the in-memory Store. Safe to call from request handlers.
+// the in-memory Store. Safe to call from request handlers, including ones
+// that already hold store.mu — both branches run in a goroutine so we never
+// re-enter the caller's lock.
 func recordHistoryAsync(gid, event, detail string) {
 	if db != nil && db.Pool != nil {
 		go func() {
@@ -108,13 +110,15 @@ func recordHistoryAsync(gid, event, detail string) {
 		}()
 		return
 	}
-	store.mu.Lock()
-	store.history[gid] = append([]HistoryEvent{{
-		ID: store.nextID(), GuildID: gid, Actor: "dashboard",
-		Event: event, Detail: detail,
-		CreatedAt: time.Now().UTC().Format(time.RFC3339),
-	}}, store.history[gid]...)
-	store.mu.Unlock()
+	go func() {
+		store.mu.Lock()
+		store.history[gid] = append([]HistoryEvent{{
+			ID: store.nextID(), GuildID: gid, Actor: "dashboard",
+			Event: event, Detail: detail,
+			CreatedAt: time.Now().UTC().Format(time.RFC3339),
+		}}, store.history[gid]...)
+		store.mu.Unlock()
+	}()
 }
 
 // taskPayload is a helper for consumers that want to build input in a typed

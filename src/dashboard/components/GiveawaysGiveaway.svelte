@@ -33,13 +33,13 @@
   onMount(load);
   $: if ($currentGuildId) load();
   $: running = giveaways.filter(g => g.status === 'running');
-  $: ended   = giveaways.filter(g => g.status === 'ended');
 </script>
 
 <div class="cards">
   <StatCard label="Active" value={String(running.length)} icon="fa-gift" />
-  <StatCard label="Ended" value={String(ended.length)} icon="fa-flag-checkered" />
-  <StatCard label="Total entrants" value={giveaways.reduce((a,g) => a+g.entrants, 0).toLocaleString()} icon="fa-user-plus" />
+  <StatCard label="Daily" value={String(giveaways.filter(g => (g.frequency || 'daily') === 'daily').length)} icon="fa-sun" />
+  <StatCard label="Weekly" value={String(giveaways.filter(g => g.frequency === 'weekly').length)} icon="fa-calendar-week" />
+  <StatCard label="Monthly" value={String(giveaways.filter(g => g.frequency === 'monthly').length)} icon="fa-calendar" />
 </div>
 
 <Panel title="All giveaways">
@@ -48,11 +48,15 @@
   </div>
   {#if loading}<p>Loading…</p>{:else if giveaways.length === 0}<p class="empty">No giveaways yet.</p>{:else}
     <table>
-      <thead><tr><th>Prize</th><th>Winners</th><th>Entrants</th><th>Ends</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th>Prize</th><th>Frequency</th><th>Winners</th><th>Entrants</th><th>Ends</th><th>Status</th><th></th></tr></thead>
       <tbody>
         {#each giveaways as g}
           <tr>
             <td>{g.prize}</td>
+            <td>
+              <span class={'freq ' + (g.frequency || 'daily')}>{g.frequency || 'daily'}</span>
+              {#if g.recurring}<i class="fa-solid fa-arrows-rotate recurring" title="Recurring"></i>{/if}
+            </td>
             <td>{g.winner_count} {#if g.winners?.length}· {g.winners.join(', ')}{/if}</td>
             <td>{g.entrants}</td>
             <td>{formatDate(g.ends_at)}</td>
@@ -77,6 +81,11 @@
   .status { padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; text-transform:uppercase; }
   .status.running { background:#dbeafe; color:#1e40af; }
   .status.ended { background:#e5e7eb; color:#475569; }
+  .freq { padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .freq.daily { background:#dcfce7; color:#166534; }
+  .freq.weekly { background:#dbeafe; color:#1e40af; }
+  .freq.monthly { background:#ede9fe; color:#5b21b6; }
+  .recurring { color:#5b21b6; margin-left:6px; }
   .actions { display:flex; gap:6px; }
   .btn { padding:6px 12px; background:#e2e8f0; color:#0f172a; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; }
   .btn.primary { background:#5865f2; color:#fff; }
